@@ -4,5 +4,6 @@ public enum TipoTransaccion {
     DEPOSITO,
     RETIRO,
     TRANSFERENCIA_ENVIADA,
-    TRANSFERENCIA_RECIBIDA
+    TRANSFERENCIA_RECIBIDA,
+    BONO
 }
