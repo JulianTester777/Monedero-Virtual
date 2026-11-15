@@ -100,6 +100,9 @@ public class Banco {
 
     public CuentaPuntos consultarPuntos(String id) { buscarCliente(id); return puntos.consultar(id); }
 
+    /** Rango actual del cliente segun sus puntos acumulados. */
+    public Rango consultarRango(String id) { buscarCliente(id); return puntos.consultarRango(id); }
+
     public ListaEnlazada<EntradaPuntos> ranking(int n) { return puntos.top(n); }
 
     public Reloj getReloj() { return reloj; }

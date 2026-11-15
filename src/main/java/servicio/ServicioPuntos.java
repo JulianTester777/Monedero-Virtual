@@ -31,6 +31,16 @@ public class ServicioPuntos {
         return c;
     }
 
+    /** Rango que corresponde a una cantidad de puntos acumulados. */
+    public static Rango calcularRango(int puntosAcumulados) {
+        return Rango.desdePuntos(puntosAcumulados);
+    }
+
+    /** Rango actual del cliente. */
+    public Rango consultarRango(String id) {
+        return consultar(id).getRango();
+    }
+
     /** Puntos que genera una operacion: division entera por cada 100 unidades. */
     public static int calcularPuntos(TipoTransaccion tipo, BigDecimal monto) {
         int bloques = monto.divideToIntegralValue(CIEN).intValue();
