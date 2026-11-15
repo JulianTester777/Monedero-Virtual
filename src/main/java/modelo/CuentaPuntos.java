@@ -24,6 +24,7 @@ public class CuentaPuntos {
     public String getClienteId() { return clienteId; }
     public int getAcumulados() { return acumulados; }
     public int getDisponibles() { return disponibles; }
+    public Rango getRango() { return Rango.desdePuntos(acumulados); }
     public ListaEnlazada<MovimientoPuntos> getHistorial() { return historial; }
 
     public boolean tieneDescuentoTransferencia() { return descuentoTransferencia; }
