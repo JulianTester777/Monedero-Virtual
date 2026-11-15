@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Análisis visual del paquete servicio del monedero virtual: Banco, ServicioPuntos, Comisiones, Reloj y OperacionInvalidaException.">
+  <title>Servicio del monedero virtual</title>
+  <link rel="stylesheet" href="estilos.css">
+  <link rel="stylesheet" href="servicio.css">
+</head>
+<body id="top">
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Proyecto final · Estructuras de datos · Análisis estático</p>
+      <h1>Paquete <code>servicio</code></h1>
+      <p class="lead">
+        La lógica de negocio del monedero virtual: <code>Banco</code> como fachada,
+        <code>ServicioPuntos</code> para el sistema de puntos y el ranking,
+        <code>Comisiones</code> para las tasas, <code>Reloj</code> para el tiempo simulado y
+        <code>OperacionInvalidaException</code> para los errores de negocio. Aquí se explica
+        cada método, uno por uno, y qué estructuras usa.
+      </p>
+      <ul class="hero-stats">
+        <li><strong>5</strong><span>clases</span></li>
+        <li><strong>29</strong><span>métodos</span></li>
+        <li><strong>3</strong><span>estructuras propias</span></li>
+        <li><strong>0</strong><span>dependencias externas</span></li>
+      </ul>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="Contenido de la página">
+    <div class="toc-inner">
+      <a href="#mapa">Mapa general</a>
+      <a href="#banco">Banco</a>
+      <a href="#puntos">ServicioPuntos</a>
+      <a href="#comisiones">Comisiones</a>
+      <a href="#reloj">Reloj</a>
+      <a href="#excepcion">Excepción</a>
+      <a href="#bigdecimal">BigDecimal</a>
+      <a href="#flujos">Flujos</a>
+      <a href="#requerimientos">Requerimientos</a>
+      <a href="#hallazgos">Hallazgos</a>
+    </div>
+  </nav>
+
+  <main id="contenido">
+
+    <section class="section" id="mapa">
+      <div class="section-head">
+        <span class="section-num">01</span>
+        <h2>Mapa general</h2>
+      </div>
+      <p>
+        El paquete <code>servicio</code> es el pegamento del proyecto: recibe el dominio de
+        <code>modelo</code>, lo guarda en las estructuras de <code>estructuras</code> y aplica
+        las reglas del negocio. Ninguna clase de aquí tiene interfaz gráfica ni código de
+        consola: eso vive en <code>interfaz.Main</code>.
+      </p>
+
+      <div class="map-grid">
+        <article class="map-card svc-banco">
+          <span class="map-symbol" aria-hidden="true">B</span>
+          <h3>Banco</h3>
+          <p>Fachada de negocio: registra clientes, mueve saldo, crea transacciones y delega los puntos.</p>
+          <p class="map-use"><strong>Usa:</strong> TablaHash, ServicioPuntos, Reloj.</p>
+          <div class="req-tags"><span class="tag">RF-01…RF-05</span><span class="tag">RA-01</span><span class="tag">RP-03</span></div>
+        </article>
+
+        <article class="map-card svc-puntos">
+          <span class="map-symbol" aria-hidden="true">★</span>
+          <h3>ServicioPuntos</h3>
+          <p>Calcula, otorga y canjea puntos, y mantiene el ranking en un árbol BST.</p>
+          <p class="map-use"><strong>Usa:</strong> TablaHash y Arbol.</p>
+          <div class="req-tags"><span class="tag">RA-01</span><span class="tag">RP-01</span><span class="tag">RP-03</span></div>
+        </article>
+
+        <article class="map-card svc-comisiones">
+          <span class="map-symbol" aria-hidden="true">%</span>
+          <h3>Comisiones</h3>
+          <p>Tasas centralizadas de transferencia y retiro, con descuento y redondeo a 2 decimales.</p>
+          <p class="map-use"><strong>Usada por:</strong> Banco (retirar y transferir).</p>
+          <div class="req-tags"><span class="tag">RF-02</span><span class="tag">RF-03</span></div>
+        </article>
+
+        <article class="map-card svc-reloj">
+          <span class="map-symbol" aria-hidden="true">◷</span>
+          <h3>Reloj</h3>
+          <p>Tiempo simulado: hora real más un desplazamiento que se puede adelantar.</p>
+          <p class="map-use"><strong>Usado por:</strong> Banco para fechas y vencimientos.</p>
+          <div class="req-tags"><span class="tag">RP-03</span><span class="tag">RA-01</span></div>
+        </article>
+
+        <article class="map-card svc-error">
+          <span class="map-symbol" aria-hidden="true">!</span>
+          <h3>OperacionInvalidaException</h3>
+          <p>Excepción no comprobada para reglas de negocio: montos, saldo, ids y beneficios.</p>
+          <p class="map-use"><strong>Lanzada por:</strong> Banco y ServicioPuntos.</p>
+          <div class="req-tags"><span class="tag">validaciones</span></div>
+        </article>
+
+        <article class="map-card svc-bigdecimal">
+          <span class="map-symbol" aria-hidden="true">.00</span>
+          <h3>BigDecimal</h3>
+          <p>No es una clase del paquete, pero atraviesa todo el servicio: dinero y tasas exactas.</p>
+          <p class="map-use"><strong>Aparece en:</strong> Banco, ServicioPuntos y Comisiones.</p>
+          <div class="req-tags"><span class="tag">RF-01…RF-04</span></div>
+        </article>
+      </div>
+
+      <ul class="relations">
+        <li><strong>Banco</strong> guarda los clientes en <code>TablaHash&lt;String, Cliente&gt;</code> y usa un <code>ServicioPuntos</code> y un <code>Reloj</code> propios.</li>
+        <li><strong>ServicioPuntos</strong> guarda las cuentas en <code>TablaHash&lt;String, CuentaPuntos&gt;</code> y el ranking en <code>Arbol&lt;EntradaPuntos&gt;</code>.</li>
+        <li><strong>Comisiones</strong> es una utilidad estática: no guarda estado y la llama <code>Banco</code>.</li>
+        <li><strong>Reloj</strong> envuelve la hora del sistema con un <code>Duration</code> de desplazamiento.</li>
+        <li><strong>OperacionInvalidaException</strong> es <em>unchecked</em> (<code>RuntimeException</code>): no obliga a <code>try/catch</code>.</li>
+        <li><strong>BigDecimal</strong> es inmutable: cada operación devuelve un objeto nuevo que hay que asignar.</li>
+      </ul>
+
+      <aside class="card howto">
+        <h3>Cómo leer esta página</h3>
+        <ul>
+          <li><strong>Color:</strong> azul = Banco, verde = ServicioPuntos, morado = Comisiones, naranja = Reloj, rojo = excepción, turquesa = BigDecimal.</li>
+          <li><strong>Visibilidad:</strong> <span class="vis public">public</span> <span class="vis private">private</span>.</li>
+          <li>Cada tabla responde <em>qué hace</em> el método y <em>qué efectos o validaciones</em> aplica.</li>
+          <li>Las complejidades se indican solo cuando dependen de una estructura (tabla hash o árbol).</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- ================================ Banco ================================ -->
+    <section class="section svc-banco" id="banco">
+      <div class="class-head">
+        <div>
+          <span class="badge-kind">Class · fachada</span>
+          <h2>Banco</h2>
+          <p>
+            Punto de entrada de la lógica. Valida las operaciones, mueve el saldo del
+            <code>Cliente</code>, crea las <code>Transaccion</code> y delega en
+            <code>ServicioPuntos</code>, <code>Comisiones</code> y <code>Reloj</code>. La demo
+            de consola (<code>Main</code>) solo habla con esta clase.
+          </p>
+        </div>
+        <div class="req-tags">
+          <span class="tag">RF-01…RF-05</span>
+          <span class="tag">RA-01</span>
+          <span class="tag">RP-03</span>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <article class="card">
+          <h3>Rol y uso</h3>
+          <p>
+            Es la única puerta para depositar, retirar, transferir, consultar y canjear. Cada
+            operación sigue el mismo patrón: <strong>validar → buscar → modificar → registrar
+            → otorgar puntos</strong>.
+          </p>
+          <h4>Se usa en</h4>
+          <ul>
+            <li><code>interfaz.Main</code>: toda la demo pasa por <code>Banco</code>.</li>
+            <li><code>Banco.depositar/retirar/transferir</code>: crean transacciones.</li>
+            <li><code>Banco.canjearBeneficio</code>: aplica el bono de saldo.</li>
+          </ul>
+          <h4>Requerimientos</h4>
+          <ul>
+            <li><strong>RF-01…RF-05:</strong> depósito, retiro, transferencia, saldo e historial.</li>
+            <li><strong>RA-01:</strong> cada operación llama a <code>ServicioPuntos.otorgar</code>.</li>
+            <li><strong>RP-03:</strong> el canje se coordina con <code>ServicioPuntos</code>.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h3>Estado interno</h3>
+          <ul class="fields">
+            <li><strong>BONO_SALDO</strong> 50</li>
+            <li><strong>clientes</strong> TablaHash</li>
+            <li><strong>puntos</strong> ServicioPuntos</li>
+            <li><strong>reloj</strong> Reloj</li>
+          </ul>
+          <p>
+            No hay base de datos ni persistencia: todo vive en memoria mientras corre la JVM.
+            La tabla hash da acceso promedio O(1) por <code>id</code>.
+          </p>
+          <div class="callout">
+            <strong>Idea clave:</strong> el saldo es responsabilidad de <code>Cliente</code>;
+            el banco solo decide cuánto acreditar o debitar y cuándo.
+          </div>
+        </article>
+      </div>
+
+      <article class="card method-card">
+        <h3>Métodos, uno por uno</h3>
+        <div class="table-wrap">
+          <table>
+            <caption class="sr-only">Métodos de Banco</caption>
+            <thead>
+              <tr><th>Método</th><th>Qué hace</th><th>Validaciones / efectos</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="sig"><code>registrarCliente(String id, String nombre)</code><span class="vis public">public</span></td>
+                <td>Comprueba los datos, crea el <code>Cliente</code>, lo guarda en la tabla hash y registra su cuenta de puntos.</td>
+                <td>Rechaza id/nombre nulos o en blanco y ids duplicados. Devuelve el <code>Cliente</code>.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>buscarCliente(String id)</code><span class="vis public">public</span></td>
+                <td>Busca el cliente por id en la <code>TablaHash</code>.</td>
+                <td>Si no existe lanza <code>OperacionInvalidaException</code>. O(1) promedio.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>listarClientes()</code><span class="vis public">public</span></td>
+                <td>Recorre las entradas de la tabla y arma una <code>ListaEnlazada&lt;Cliente&gt;</code> nueva.</td>
+                <td>No garantiza un orden concreto: depende de las cubetas del hash.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>depositar(String id, BigDecimal monto)</code><span class="vis public">public</span></td>
+                <td>Valida el monto, busca al cliente, acredita el saldo y crea una <code>Transaccion</code> de tipo <code>DEPOSITO</code> con comisión cero y la fecha del reloj.</td>
+                <td>Agrega la transacción al historial y llama a <code>puntos.otorgar</code>. Devuelve la transacción.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>retirar(String id, BigDecimal monto)</code><span class="vis public">public</span></td>
+                <td>Calcula la comisión con <code>Comisiones.retiro</code> (gratis si hay beneficio activo), suma monto + comisión, valida saldo y debita el total.</td>
+                <td>Crea una <code>Transaccion</code> de tipo <code>RETIRO</code>, la agrega al historial y otorga puntos. Devuelve la transacción.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>transferir(String idOrigen, String idDestino, BigDecimal monto)</code><span class="vis public">public</span></td>
+                <td>Valida el monto y que las cuentas sean distintas; busca ambos clientes; calcula la comisión con <code>Comisiones.transferencia</code> (2% o 1,8% con descuento).</td>
+                <td>Valida el saldo del origen, debita monto + comisión y acredita el monto al destino. Crea dos transacciones: <code>TRANSFERENCIA_ENVIADA</code> y <code>TRANSFERENCIA_RECIBIDA</code>.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>canjearBeneficio(String id, Beneficio beneficio)</code><span class="vis public">public</span></td>
+                <td>Pide a <code>ServicioPuntos.canjear</code> que valide y gaste los puntos; después aplica el efecto del beneficio.</td>
+                <td>Si es <code>BONO_SALDO</code>, acredita 50 y agrega una <code>Transaccion</code> de tipo <code>BONO</code>. Devuelve el <code>MovimientoPuntos</code>.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>consultarSaldo(String id)</code><span class="vis public">public</span></td>
+                <td>Busca al cliente y devuelve <code>getSaldo()</code>.</td>
+                <td>Lanza la excepción de <code>buscarCliente</code> si el id no existe.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>consultarHistorial(String id)</code><span class="vis public">public</span></td>
+                <td>Devuelve la <code>ListaEnlazada&lt;Transaccion&gt;</code> del cliente.</td>
+                <td>Es la lista interna, no una copia: el llamador puede modificarla.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>consultarPuntos(String id)</code><span class="vis public">public</span></td>
+                <td>Valida que el cliente exista y devuelve su <code>CuentaPuntos</code>.</td>
+                <td>Delega en <code>ServicioPuntos.consultar</code>.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>ranking(int n)</code><span class="vis public">public</span></td>
+                <td>Devuelve los <code>n</code> clientes con más puntos.</td>
+                <td>Delega en <code>ServicioPuntos.top(n)</code>.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>getReloj()</code><span class="vis public">public</span></td>
+                <td>Devuelve el <code>Reloj</code> que usa el banco.</td>
+                <td>Permite avanzar días desde la demo; expone el objeto mutable.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>validarMonto(BigDecimal monto)</code><span class="vis private">private</span></td>
+                <td>Comprueba que el monto no sea nulo ni menor o igual a cero.</td>
+                <td>Lanza <code>OperacionInvalidaException</code> con el mensaje «El monto debe ser mayor que cero.»</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>validarSaldo(Cliente c, BigDecimal total, BigDecimal comision)</code><span class="vis private">private</span></td>
+                <td>Compara el saldo del cliente con el total a debitar.</td>
+                <td>Si falta saldo, lanza la excepción con el total, la comisión y el saldo actual.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card notes">
+        <h3>Detalles a tener en cuenta</h3>
+        <ul>
+          <li>En una transferencia, la comisión la paga el origen y solo el origen gana puntos.</li>
+          <li>El destino recibe el monto completo; su transacción se registra con comisión cero.</li>
+          <li>Las fechas siempre salen de <code>reloj.ahora()</code>, nunca de <code>LocalDateTime.now()</code> directo.</li>
+          <li><code>transferir</code> llama a <code>idOrigen.equals(idDestino)</code> antes de validar nulos: un <code>idOrigen</code> nulo produciría <code>NullPointerException</code>.</li>
+          <li>El canje de <code>BONO_SALDO</code> reparte el trabajo: los puntos se gastan en <code>ServicioPuntos</code> y el saldo se acredita en <code>Banco</code>.</li>
+        </ul>
+      </article>
+    </section>
+
+    <!-- ============================= ServicioPuntos ============================= -->
+    <section class="section svc-puntos" id="puntos">
+      <div class="class-head">
+        <div>
+          <span class="badge-kind">Class · lógica de puntos</span>
+          <h2>ServicioPuntos</h2>
+          <p>
+            Todo lo relacionado con los puntos: cuántos genera una transacción, cómo se suman,
+            cómo se canjean y cómo se mantiene el ranking. Usa una tabla hash para las cuentas
+            y un árbol BST para el orden por puntos.
+          </p>
+        </div>
+        <div class="req-tags">
+          <span class="tag">RA-01 · puntos</span>
+          <span class="tag">RP-01 · historial</span>
+          <span class="tag">RP-03 · canje</span>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <article class="card">
+          <h3>Rol y uso</h3>
+          <p>
+            <code>Banco</code> lo usa en cada operación. También puede usarse solo para
+            consultar puntos, ver el ranking o la altura del árbol. El registro de un cliente
+            crea su cuenta y una entrada inicial con 0 puntos.
+          </p>
+          <h4>Se usa en</h4>
+          <ul>
+            <li><code>Banco.depositar/retirar/transferir</code>: <code>otorgar(t)</code>.</li>
+            <li><code>Banco.canjearBeneficio</code>: <code>canjear(id, beneficio, ahora)</code>.</li>
+            <li><code>Banco.consultarPuntos</code> y <code>Banco.ranking</code>.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h3>Estructuras internas</h3>
+          <ul class="fields">
+            <li><strong>cuentas</strong> TablaHash&lt;String, CuentaPuntos&gt;</li>
+            <li><strong>ranking</strong> Arbol&lt;EntradaPuntos&gt;</li>
+          </ul>
+          <p>
+            La tabla da acceso promedio O(1) por id. El árbol mantiene el orden por puntos
+            acumulados; <code>EntradaPuntos</code> desempata por id. El BST no está balanceado.
+          </p>
+          <div class="formula">puntos = (monto / 100) entero × factor del tipo</div>
+          <p>
+            Factores: depósito ×1, retiro ×2, transferencia enviada ×3; transferencia recibida
+            y bono ×0.
+          </p>
+        </article>
+      </div>
+
+      <article class="card method-card">
+        <h3>Métodos, uno por uno</h3>
+        <div class="table-wrap">
+          <table>
+            <caption class="sr-only">Métodos de ServicioPuntos</caption>
+            <thead>
+              <tr><th>Método</th><th>Qué hace</th><th>Validaciones / efectos</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="sig"><code>registrarCliente(String id)</code><span class="vis public">public</span></td>
+                <td>Crea una <code>CuentaPuntos</code> nueva y la guarda en la tabla hash; inserta <code>EntradaPuntos(id, 0)</code> en el árbol.</td>
+                <td>No valida el id: se espera que <code>Banco</code> ya lo haya validado.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>consultar(String id)</code><span class="vis public">public</span></td>
+                <td>Busca la cuenta de puntos por id.</td>
+                <td>Si no existe lanza <code>OperacionInvalidaException</code>. O(1) promedio.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>calcularPuntos(TipoTransaccion tipo, BigDecimal monto)</code><span class="vis public">public</span></td>
+                <td>Divide el monto entre 100 con <code>divideToIntegralValue</code> y multiplica según el tipo.</td>
+                <td><code>DEPOSITO</code> ×1, <code>RETIRO</code> ×2, <code>TRANSFERENCIA_ENVIADA</code> ×3; el resto 0. Es <code>static</code>.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>otorgar(Transaccion t)</code><span class="vis public">public</span></td>
+                <td>Calcula los puntos de la transacción; si son 0 no hace nada. Si no, suma a la cuenta, crea un <code>MovimientoPuntos</code> de tipo <code>GANADOS</code> y actualiza el ranking.</td>
+                <td>Guarda los acumulados anteriores, suma y mueve la entrada del árbol. Devuelve los puntos ganados.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>canjear(String id, Beneficio beneficio, LocalDateTime ahora)</code><span class="vis public">public</span></td>
+                <td>Valida que haya puntos suficientes y que el beneficio no esté ya activo; luego gasta los puntos, activa el beneficio y registra un <code>MovimientoPuntos</code> de tipo <code>CANJE</code>.</td>
+                <td>Descuento: activa el booleano. Sin cargos: vence a los 30 días. Bono: no hace nada aquí (lo aplica <code>Banco</code>).</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>top(int n)</code><span class="vis public">public</span></td>
+                <td>Devuelve los <code>n</code> clientes con más puntos, de mayor a menor.</td>
+                <td>Delega en <code>Arbol.mayores(n)</code>.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>rankingCompleto()</code><span class="vis public">public</span></td>
+                <td>Devuelve todos los clientes ordenados por puntos, de mayor a menor.</td>
+                <td>Usa <code>mayores(tamano())</code>.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>alturaArbol()</code><span class="vis public">public</span></td>
+                <td>Devuelve la altura actual del árbol de ranking.</td>
+                <td>Útil para ver si el BST degeneró.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>actualizarRanking(String id, int anterior, int nuevo)</code><span class="vis private">private</span></td>
+                <td>Elimina la entrada vieja <code>(id, anterior)</code> e inserta <code>(id, nuevo)</code>.</td>
+                <td>El árbol no permite duplicados: hay que quitar la entrada anterior para mover al cliente.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card notes">
+        <h3>Detalles a tener en cuenta</h3>
+        <ul>
+          <li><code>calcularPuntos</code> usa división entera: 150 unidades dan 1 bloque; 99 dan 0.</li>
+          <li>Las transferencias recibidas y los bonos no generan puntos.</li>
+          <li>El árbol guarda <code>EntradaPuntos</code>, no <code>Cliente</code>: la entrada es inmutable y se reemplaza al cambiar los puntos.</li>
+          <li>El BST no se balancea: si los puntos crecen en orden, el ranking puede degenerar en lista.</li>
+          <li><code>calcularPuntos</code> no valida montos nulos ni negativos; <code>intValue()</code> puede desbordar con montos enormes.</li>
+        </ul>
+      </article>
+    </section>
+
+    <!-- ================================ Comisiones ================================ -->
+    <section class="section svc-comisiones" id="comisiones">
+      <div class="class-head">
+        <div>
+          <span class="badge-kind">Class · utilidad final</span>
+          <h2>Comisiones</h2>
+          <p>
+            Reglas de comisión centralizadas. Es una clase <code>final</code> sin estado: solo
+            constantes y dos métodos estáticos. Cambiar una tasa aquí cambia todo el sistema.
+          </p>
+        </div>
+        <div class="req-tags">
+          <span class="tag">RF-02 · retiro</span>
+          <span class="tag">RF-03 · transferencia</span>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <article class="card">
+          <h3>Rol y uso</h3>
+          <p>
+            <code>Banco</code> la llama al retirar y al transferir. No conoce clientes ni
+            saldos: solo recibe el monto y un booleano que indica si hay beneficio activo.
+          </p>
+          <h4>Se usa en</h4>
+          <ul>
+            <li><code>Banco.retirar</code>: <code>retiro(monto, gratis)</code>.</li>
+            <li><code>Banco.transferir</code>: <code>transferencia(monto, conDescuento)</code>.</li>
+          </ul>
+          <h4>Requerimientos</h4>
+          <ul>
+            <li><strong>RF-02:</strong> la comisión de retiro es 1%.</li>
+            <li><strong>RF-03:</strong> la comisión de transferencia es 2%.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h3>Tasas y constantes</h3>
+          <div class="table-wrap">
+            <table class="const-table">
+              <caption class="sr-only">Constantes de Comisiones</caption>
+              <thead>
+                <tr><th>Constante</th><th>Valor</th><th>Significado</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>TASA_TRANSFERENCIA</code></td>
+                  <td>0.02</td>
+                  <td>2% del monto transferido.</td>
+                </tr>
+                <tr>
+                  <td><code>TASA_RETIRO</code></td>
+                  <td>0.01</td>
+                  <td>1% del monto retirado.</td>
+                </tr>
+                <tr>
+                  <td><code>FACTOR_DESCUENTO</code></td>
+                  <td>0.90</td>
+                  <td>Privada: deja la tasa de transferencia en 1,8%.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="formula">comisión = monto × tasa<br>redondeada a 2 decimales con HALF_UP</div>
+        </article>
+      </div>
+
+      <article class="card method-card">
+        <h3>Métodos, uno por uno</h3>
+        <div class="table-wrap">
+          <table>
+            <caption class="sr-only">Métodos de Comisiones</caption>
+            <thead>
+              <tr><th>Método</th><th>Qué hace</th><th>Detalle</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="sig"><code>Comisiones()</code><span class="vis private">private</span></td>
+                <td>Constructor privado para impedir instancias.</td>
+                <td>Es una clase de utilidades estáticas.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>transferencia(BigDecimal monto, boolean conDescuento)</code><span class="vis public">public</span></td>
+                <td>Elige la tasa (2% o 2% × 0.90), multiplica por el monto y redondea a 2 decimales.</td>
+                <td>Con descuento, la tasa efectiva es 1,8%. Es <code>static</code>.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>retiro(BigDecimal monto, boolean gratis)</code><span class="vis public">public</span></td>
+                <td>Si el retiro es gratis devuelve <code>0.00</code>; si no, aplica 1% y redondea a 2 decimales.</td>
+                <td>El redondeo es <code>HALF_UP</code>. Es <code>static</code>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card notes">
+        <h3>Detalles a tener en cuenta</h3>
+        <ul>
+          <li>El descuento del 10% se aplica a la <em>tasa</em>, no al monto: 2% → 1,8%.</li>
+          <li>Todas las comisiones se redondean a 2 decimales con <code>RoundingMode.HALF_UP</code>.</li>
+          <li>Al ser estática y sin estado, no hay riesgo de que una operación “contamine” a otra.</li>
+          <li>No valida montos: confía en que <code>Banco.validarMonto</code> ya lo hizo.</li>
+        </ul>
+      </article>
+    </section>
+
+    <!-- ================================== Reloj ================================== -->
+    <section class="section svc-reloj" id="reloj">
+      <div class="class-head">
+        <div>
+          <span class="badge-kind">Class · tiempo simulado</span>
+          <h2>Reloj</h2>
+          <p>
+            Envuelve la hora del sistema y le suma un desplazamiento. Así se puede “viajar al
+            futuro” para probar vencimientos de beneficios sin esperar días reales.
+          </p>
+        </div>
+        <div class="req-tags">
+          <span class="tag">RP-03 · vencimiento de beneficios</span>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <article class="card">
+          <h3>Rol y uso</h3>
+          <p>
+            <code>Banco</code> lo usa para fechar cada transacción y para saber si un retiro
+            tiene el beneficio de “sin cargos” activo. La demo puede llamar a
+            <code>banco.getReloj().avanzarDias(31)</code> y probar el vencimiento.
+          </p>
+          <h4>Se usa en</h4>
+          <ul>
+            <li><code>Banco.depositar/retirar/transferir</code>: fecha de la transacción.</li>
+            <li><code>Banco.canjearBeneficio</code>: fecha del movimiento y vencimiento.</li>
+            <li><code>CuentaPuntos.tieneRetiroGratis(ahora)</code>: compara con la fecha.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h3>Cómo funciona</h3>
+          <ul class="fields">
+            <li><strong>desplazamiento</strong> Duration.ZERO</li>
+          </ul>
+          <div class="formula">ahora() = LocalDateTime.now() + desplazamiento</div>
+          <p>
+            <code>avanzarDias</code> no cambia la hora del sistema: solo acumula días en el
+            desplazamiento. El tiempo sigue siendo el real, pero “adelantado”.
+          </p>
+          <div class="callout">
+            <strong>Cuidado:</strong> el desplazamiento es mutable y no está sincronizado. No
+            es un reloj pensado para concurrencia.
+          </div>
+        </article>
+      </div>
+
+      <article class="card method-card">
+        <h3>Métodos, uno por uno</h3>
+        <div class="table-wrap">
+          <table>
+            <caption class="sr-only">Métodos de Reloj</caption>
+            <thead>
+              <tr><th>Método</th><th>Qué hace</th><th>Detalle</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="sig"><code>ahora()</code><span class="vis public">public</span></td>
+                <td>Devuelve <code>LocalDateTime.now()</code> más el desplazamiento actual.</td>
+                <td>Cada llamada vuelve a leer la hora real.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>avanzarDias(long dias)</code><span class="vis public">public</span></td>
+                <td>Suma <code>dias</code> al desplazamiento con <code>Duration.plusDays</code>.</td>
+                <td>Acepta valores negativos (retrocede) y acumula entre llamadas.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card notes">
+        <h3>Detalles a tener en cuenta</h3>
+        <ul>
+          <li>El reloj no guarda una fecha fija: siempre parte de la hora real.</li>
+          <li>Avanzar días afecta a todas las cuentas y beneficios a la vez.</li>
+          <li>No hay zona horaria explícita: se usa la del sistema.</li>
+        </ul>
+      </article>
+    </section>
+
+    <!-- ============================== Excepción ============================== -->
+    <section class="section svc-error" id="excepcion">
+      <div class="class-head">
+        <div>
+          <span class="badge-kind">Class · excepción</span>
+          <h2>OperacionInvalidaException</h2>
+          <p>
+            Excepción propia para errores de negocio. Extiende <code>RuntimeException</code>,
+            así que es <em>no comprobada</em>: el código que llama no está obligado a capturarla.
+          </p>
+        </div>
+        <div class="req-tags">
+          <span class="tag">validaciones</span>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <article class="card">
+          <h3>Rol y uso</h3>
+          <p>
+            Representa una operación rechazada por las reglas del sistema: monto inválido,
+            saldo insuficiente, cliente inexistente, puntos insuficientes o beneficio ya activo.
+          </p>
+          <h4>Se lanza en</h4>
+          <ul>
+            <li><code>Banco.validarMonto</code> y <code>validarSaldo</code>.</li>
+            <li><code>Banco.buscarCliente</code> y <code>registrarCliente</code>.</li>
+            <li><code>ServicioPuntos.consultar</code> y <code>canjear</code>.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h3>Por qué una excepción propia</h3>
+          <ul>
+            <li>Distingue errores de negocio de fallos técnicos.</li>
+            <li>Permite capturarla en la demo y mostrar el mensaje.</li>
+            <li>Al ser <em>unchecked</em>, no ensucia las firmas con <code>throws</code>.</li>
+          </ul>
+          <div class="callout">
+            <strong>Ojo:</strong> al ser no comprobada, nada obliga a capturarla; si no se
+            maneja, el programa termina con el mensaje de error.
+          </div>
+        </article>
+      </div>
+
+      <article class="card method-card">
+        <h3>Métodos, uno por uno</h3>
+        <div class="table-wrap">
+          <table>
+            <caption class="sr-only">Métodos de OperacionInvalidaException</caption>
+            <thead>
+              <tr><th>Método</th><th>Qué hace</th><th>Detalle</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="sig"><code>OperacionInvalidaException(String mensaje)</code><span class="vis public">public</span></td>
+                <td>Construye la excepción con el mensaje recibido.</td>
+                <td>Llama a <code>super(mensaje)</code>; no agrega campos ni métodos.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card notes">
+        <h3>Detalles a tener en cuenta</h3>
+        <ul>
+          <li>No tiene código propio más allá del constructor: toda la funcionalidad viene de <code>RuntimeException</code>.</li>
+          <li>Los mensajes son los que ve el usuario en la demo; conviene mantenerlos claros.</li>
+        </ul>
+      </article>
+    </section>
+
+    <!-- =============================== BigDecimal =============================== -->
+    <section class="section svc-bigdecimal" id="bigdecimal">
+      <div class="class-head">
+        <div>
+          <span class="badge-kind">Concepto · java.math</span>
+          <h2>Qué es <code>BigDecimal</code></h2>
+          <p>
+            <code>BigDecimal</code> es una clase de Java para representar números decimales con
+            precisión arbitraria y sin los errores de redondeo del punto flotante binario
+            (<code>float</code>/<code>double</code>). En este proyecto se usa para todo lo que
+            sea dinero o tasas.
+          </p>
+        </div>
+        <div class="req-tags">
+          <span class="tag">RF-01…RF-04 · dinero</span>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <article class="card">
+          <h3>Qué es exactamente</h3>
+          <p>
+            Un <code>BigDecimal</code> guarda un número como un entero sin escala más una
+            escala decimal:
+          </p>
+          <div class="formula">valor = valorSinEscala × 10<sup>-escala</sup></div>
+          <p>
+            Por ejemplo, <code>492.00</code> se guarda como valor sin escala <code>49200</code>
+            y escala <code>2</code>. Por eso puede conservar los ceros de los centavos y no
+            pierde precisión al sumar o restar.
+          </p>
+          <h4>Inmutable</h4>
+          <p>
+            No se modifica “en el lugar”: <code>add</code>, <code>subtract</code>,
+            <code>multiply</code>, <code>setScale</code>, etc. devuelven un objeto nuevo. Hay
+            que asignar el resultado.
+          </p>
+          <div class="formula">saldo = saldo.add(monto);  // no: saldo.add(monto);</div>
+        </article>
+
+        <article class="card">
+          <h3>Por qué no <code>double</code></h3>
+          <p>
+            <code>double</code> usa binario y no puede representar exactamente muchos decimales.
+            El caso clásico:
+          </p>
+          <div class="formula">0.1 + 0.2 == 0.30000000000000004</div>
+          <p>
+            Para un monedero eso es inaceptable: los centavos se acumulan mal. <code>BigDecimal</code>
+            representa los decimales tal como se escriben y permite controlar el redondeo.
+          </p>
+          <h4>Costo</h4>
+          <p>
+            Es más pesado y más lento que un <code>double</code>, pero la exactitud vale la pena
+            para dinero.
+          </p>
+        </article>
+      </div>
+
+      <article class="card method-card">
+        <h3>Métodos y constantes que usa el proyecto</h3>
+        <div class="table-wrap">
+          <table>
+            <caption class="sr-only">Uso de BigDecimal en el proyecto</caption>
+            <thead>
+              <tr><th>Operación</th><th>Dónde aparece</th><th>Qué hace</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="sig"><code>new BigDecimal(String)</code></td>
+                <td><code>Comisiones</code>, <code>Banco.BONO_SALDO</code></td>
+                <td>Crea un decimal exacto a partir de texto. Es la forma recomendada para tasas y montos.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>new BigDecimal(int)</code></td>
+                <td><code>ServicioPuntos.CIEN</code></td>
+                <td>Crea el 100 exacto para dividir los bloques de puntos.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>BigDecimal.ZERO</code></td>
+                <td><code>Cliente.saldo</code>, comisiones cero, validaciones</td>
+                <td>Constante con valor 0 y escala 0.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>add(BigDecimal)</code></td>
+                <td><code>Cliente.acreditar</code>, <code>Banco.retirar/transferir</code></td>
+                <td>Suma exacta; devuelve un nuevo <code>BigDecimal</code>.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>subtract(BigDecimal)</code></td>
+                <td><code>Cliente.debitar</code></td>
+                <td>Resta exacta; devuelve un nuevo <code>BigDecimal</code>.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>multiply(BigDecimal)</code></td>
+                <td><code>Comisiones.transferencia/retiro</code></td>
+                <td>Multiplica monto por tasa; el resultado puede tener más decimales.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>divideToIntegralValue(BigDecimal)</code></td>
+                <td><code>ServicioPuntos.calcularPuntos</code></td>
+                <td>Devuelve solo la parte entera de la división: 150 / 100 = 1.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>intValue()</code></td>
+                <td><code>ServicioPuntos.calcularPuntos</code></td>
+                <td>Convierte el resultado a <code>int</code> para contar bloques de puntos.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>setScale(2, RoundingMode.HALF_UP)</code></td>
+                <td><code>Comisiones</code></td>
+                <td>Fija 2 decimales y redondea: 0,5 sube; 0,4 baja.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>compareTo(BigDecimal)</code></td>
+                <td><code>Banco.validarMonto</code>, <code>validarSaldo</code></td>
+                <td>Compara valores numéricos: devuelve negativo, cero o positivo. Es la forma correcta de comparar montos.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>signum()</code></td>
+                <td><code>Transaccion.toString</code></td>
+                <td>Devuelve -1, 0 o 1 según el signo; se usa para mostrar la comisión solo si es mayor que cero.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>toPlainString()</code></td>
+                <td><code>Cliente</code>, <code>Transaccion</code>, mensajes de error</td>
+                <td>Imprime el número sin notación científica ni exponentes.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <div class="grid-2">
+        <article class="card">
+          <h3><code>compareTo</code> vs <code>equals</code></h3>
+          <p>
+            <code>equals</code> tiene en cuenta la escala; <code>compareTo</code> compara el
+            valor numérico.
+          </p>
+          <div class="formula">new BigDecimal("2.0").equals(new BigDecimal("2.00"))  // false<br>new BigDecimal("2.0").compareTo(new BigDecimal("2.00")) // 0</div>
+          <p>
+            En el proyecto se usa <code>compareTo</code> para validar montos y saldos. Para
+            comparar dinero, esa es la opción correcta.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>Errores comunes</h3>
+          <ul>
+            <li>Usar <code>==</code> para comparar: compara referencias, no valores.</li>
+            <li>Olvidar asignar el resultado de <code>add</code>/<code>subtract</code>: el objeto es inmutable.</li>
+            <li>Crear con <code>new BigDecimal(0.02)</code> desde un <code>double</code>: arrastra su imprecisión. Mejor <code>new BigDecimal("0.02")</code>.</li>
+            <li>Dividir con <code>divide</code> sin escala ni redondeo: puede lanzar <code>ArithmeticException</code> si el resultado no termina.</li>
+            <li>Asumir que <code>equals</code> ignora la escala: no lo hace.</li>
+          </ul>
+        </article>
+      </div>
+
+      <article class="card notes">
+        <h3>Cómo se ve en este proyecto</h3>
+        <ul>
+          <li><code>Cliente.saldo</code> empieza en <code>BigDecimal.ZERO</code> y cambia con <code>add</code>/<code>subtract</code>.</li>
+          <li><code>Comisiones</code> multiplica por tasas y fija 2 decimales con <code>HALF_UP</code>.</li>
+          <li><code>ServicioPuntos</code> usa <code>divideToIntegralValue</code> para obtener bloques enteros de 100.</li>
+          <li><code>Banco</code> valida con <code>compareTo</code>, no con <code>equals</code> ni con operadores.</li>
+          <li>Los mensajes de error usan <code>toPlainString()</code> para mostrar el saldo tal cual.</li>
+        </ul>
+      </article>
+    </section>
+
+    <!-- ================================= Flujos ================================= -->
+    <section class="section" id="flujos">
+      <div class="section-head">
+        <span class="section-num">08</span>
+        <h2>Flujos de operación</h2>
+      </div>
+      <p>
+        Los cuatro recorridos principales del servicio. Sirven para ver qué clase hace cada
+        paso y en qué orden.
+      </p>
+
+      <div class="grid-2">
+        <article class="card">
+          <h3>Depósito</h3>
+          <ol class="steps">
+            <li><code>Banco.validarMonto</code> comprueba que sea mayor que cero.</li>
+            <li><code>buscarCliente</code> lo encuentra en la tabla hash.</li>
+            <li><code>Cliente.acreditar</code> suma el saldo.</li>
+            <li>Se crea una <code>Transaccion</code> <code>DEPOSITO</code> y se agrega al historial.</li>
+            <li><code>ServicioPuntos.otorgar</code> calcula 1 punto por cada 100 y actualiza el ranking.</li>
+          </ol>
+        </article>
+
+        <article class="card">
+          <h3>Retiro</h3>
+          <ol class="steps">
+            <li><code>validarMonto</code> y <code>buscarCliente</code>.</li>
+            <li><code>Comisiones.retiro</code> calcula 1% o 0 si está activo el beneficio.</li>
+            <li><code>validarSaldo</code> compara saldo con monto + comisión.</li>
+            <li><code>Cliente.debitar</code> descuenta el total.</li>
+            <li>Se registra la <code>Transaccion</code> <code>RETIRO</code> y se otorgan 2 puntos por cada 100.</li>
+          </ol>
+        </article>
+
+        <article class="card">
+          <h3>Transferencia</h3>
+          <ol class="steps">
+            <li><code>validarMonto</code> y comprobar que origen y destino sean distintos.</li>
+            <li><code>buscarCliente</code> para ambos; <code>Comisiones.transferencia</code> aplica 2% o 1,8%.</li>
+            <li><code>validarSaldo</code> sobre el origen; se debita monto + comisión.</li>
+            <li>Se acredita el monto al destino.</li>
+            <li>Se crean dos transacciones; solo la enviada otorga 3 puntos por cada 100.</li>
+          </ol>
+        </article>
+
+        <article class="card">
+          <h3>Canje de beneficio</h3>
+          <ol class="steps">
+            <li><code>Banco.canjearBeneficio</code> valida el cliente y toma la hora del reloj.</li>
+            <li><code>ServicioPuntos.canjear</code> comprueba puntos disponibles y que el beneficio no esté activo.</li>
+            <li><code>CuentaPuntos.gastar</code> descuenta los puntos y se activa el beneficio.</li>
+            <li>Se registra un <code>MovimientoPuntos</code> de tipo <code>CANJE</code>.</li>
+            <li>Si es <code>BONO_SALDO</code>, <code>Banco</code> acredita 50 y registra una transacción <code>BONO</code>.</li>
+          </ol>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============================== Requerimientos ============================== -->
+    <section class="section" id="requerimientos">
+      <div class="section-head">
+        <span class="section-num">09</span>
+        <h2>Requerimientos que cubre el servicio</h2>
+      </div>
+      <p>
+        Cruce de las reglas del proyecto con la clase que las implementa. El estado se deduce
+        del código, no de suposiciones.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <caption class="sr-only">Requerimientos cubiertos por el paquete servicio</caption>
+          <thead>
+            <tr><th>Requerimiento</th><th>Estado</th><th>Dónde se implementa</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>RF-01</strong><br><span class="muted">depósito</span></td>
+              <td><span class="status ok">Implementado</span></td>
+              <td><code>Banco.depositar</code> + <code>ServicioPuntos.otorgar</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>RF-02</strong><br><span class="muted">retiro con saldo suficiente</span></td>
+              <td><span class="status ok">Implementado</span></td>
+              <td><code>Banco.retirar</code> + <code>Comisiones.retiro</code> + <code>validarSaldo</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>RF-03</strong><br><span class="muted">transferencia entre cuentas</span></td>
+              <td><span class="status ok">Implementado</span></td>
+              <td><code>Banco.transferir</code> + <code>Comisiones.transferencia</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>RF-04</strong><br><span class="muted">consulta de saldo</span></td>
+              <td><span class="status ok">Implementado</span></td>
+              <td><code>Banco.consultarSaldo</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>RF-05</strong><br><span class="muted">historial de transacciones</span></td>
+              <td><span class="status ok">Implementado</span></td>
+              <td><code>Banco.consultarHistorial</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>RA-01</strong><br><span class="muted">sistema de puntos</span></td>
+              <td><span class="status ok">Implementado</span></td>
+              <td><code>ServicioPuntos</code> con TablaHash + Arbol.</td>
+            </tr>
+            <tr>
+              <td><strong>RP-01</strong><br><span class="muted">historial de puntos</span></td>
+              <td><span class="status ok">Implementado</span></td>
+              <td><code>ServicioPuntos.otorgar</code> registra cada <code>MovimientoPuntos</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>RP-03</strong><br><span class="muted">canje de beneficios</span></td>
+              <td><span class="status ok">Implementado</span></td>
+              <td><code>ServicioPuntos.canjear</code> + <code>Banco.canjearBeneficio</code>.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- =============================== Hallazgos =============================== -->
+    <section class="section" id="hallazgos">
+      <div class="section-head">
+        <span class="section-num">10</span>
+        <h2>Hallazgos de la revisión</h2>
+      </div>
+      <p>
+        Observaciones de calidad y diseño del paquete servicio. No se corrigió nada: el
+        análisis es de solo lectura.
+      </p>
+
+      <div class="findings">
+        <article class="finding good">
+          <h3>Lo que está bien</h3>
+          <ul>
+            <li><strong>Fachada clara:</strong> <code>Banco</code> centraliza las operaciones y valida antes de modificar.</li>
+            <li><strong>Responsabilidades separadas:</strong> puntos, comisiones y tiempo viven en clases distintas.</li>
+            <li><strong>Tasas centralizadas:</strong> <code>Comisiones</code> evita números mágicos repartidos.</li>
+            <li><strong>Tiempo simulable:</strong> <code>Reloj</code> permite probar vencimientos sin esperar.</li>
+            <li><strong>Puntos coherentes:</strong> solo el emisor gana puntos en una transferencia.</li>
+            <li><strong>Dinero exacto:</strong> todo usa <code>BigDecimal</code> y <code>compareTo</code>.</li>
+            <li>Los métodos son cortos y los nombres son claros.</li>
+          </ul>
+        </article>
+
+        <article class="finding warn">
+          <h3>Puntos de mejora</h3>
+          <ul>
+            <li><strong>Nulos en <code>transferir</code>:</strong> <code>idOrigen.equals(...)</code> se ejecuta antes de validar nulos; un id nulo produce <code>NullPointerException</code>.</li>
+            <li><strong><code>calcularPuntos</code> público:</strong> no valida monto nulo ni negativo y <code>intValue()</code> puede desbordar.</li>
+            <li><strong><code>Reloj</code> no es thread-safe:</strong> el desplazamiento mutable no está sincronizado.</li>
+            <li><strong>Estado expuesto:</strong> <code>getReloj</code> y <code>consultarHistorial</code> devuelven objetos mutables internos.</li>
+            <li><strong><code>canjearBeneficio(null)</code>:</strong> termina en <code>NullPointerException</code> dentro de <code>ServicioPuntos.canjear</code>.</li>
+            <li><strong>Validación duplicada:</strong> <code>ServicioPuntos.registrarCliente</code> y <code>consultar</code> confían en que <code>Banco</code> ya validó.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <p>
+        <strong>Análisis estático</strong> de <code>src/main/java/servicio</code>.
+        No se ejecutó el código Java ni se modificaron los archivos del proyecto.
+      </p>
+      <p>
+        <a href="../index.html">← Índice</a> ·
+        <a href="../explicacion_estructuras/index.html">Ver estructuras</a> ·
+        <a href="../explicacion_modelo/index.html">Ver modelo</a> ·
+        <a href="#top">Volver arriba ↑</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

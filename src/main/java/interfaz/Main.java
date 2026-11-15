@@ -1,6 +1,4 @@
-package com.monedero;
-
-
+package interfaz;
 
 import estructuras.Arbol;
 import modelo.*;

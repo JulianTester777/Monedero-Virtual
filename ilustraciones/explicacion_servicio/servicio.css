@@ -1,0 +1,105 @@
+/* ============================================================
+   Acentos propios del paquete servicio
+   Se apoyan en las variables y clases de estilos.css
+   ============================================================ */
+
+.svc-banco {
+  --accent: var(--blue);
+  --accent-soft: var(--blue-soft);
+}
+
+.svc-puntos {
+  --accent: var(--green);
+  --accent-soft: var(--green-soft);
+}
+
+.svc-comisiones {
+  --accent: var(--purple);
+  --accent-soft: var(--purple-soft);
+}
+
+.svc-reloj {
+  --accent: var(--orange);
+  --accent-soft: var(--orange-soft);
+}
+
+.svc-error {
+  --accent: var(--red);
+  --accent-soft: var(--red-soft);
+}
+
+.svc-bigdecimal {
+  --accent: #0f766e;
+  --accent-soft: #dff5f2;
+}
+
+/* Campos y constantes */
+.fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fields li {
+  padding: 5px 10px;
+  background: var(--head);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.fields li strong {
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 700;
+}
+
+/* Fórmulas y llamadas destacadas */
+.formula {
+  margin: 12px 0;
+  padding: 12px 14px;
+  background: var(--head);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent, var(--blue));
+  border-radius: 10px;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  overflow-x: auto;
+}
+
+.callout {
+  margin: 14px 0;
+  padding: 12px 14px;
+  background: var(--accent-soft, var(--head));
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 0.92rem;
+}
+
+.callout strong {
+  color: var(--accent, var(--ink));
+}
+
+/* Tabla de constantes */
+.const-table td:first-child {
+  width: 32%;
+}
+
+.const-table code {
+  font-weight: 700;
+}
+
+/* Pasos de un flujo */
+.steps {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.steps li {
+  margin: 6px 0;
+}

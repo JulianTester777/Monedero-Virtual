@@ -1,0 +1,83 @@
+/* ============================================================
+   Acentos propios del paquete modelo
+   Se apoyan en las variables y clases de estilos.css
+   ============================================================ */
+
+/* Color por tipo del dominio */
+.model-cliente {
+  --accent: var(--blue);
+  --accent-soft: var(--blue-soft);
+}
+
+.model-cuenta {
+  --accent: var(--green);
+  --accent-soft: var(--green-soft);
+}
+
+.model-transaccion {
+  --accent: var(--purple);
+  --accent-soft: var(--purple-soft);
+}
+
+.model-entrada {
+  --accent: var(--orange);
+  --accent-soft: var(--orange-soft);
+}
+
+.model-movimiento {
+  --accent: #0f766e;
+  --accent-soft: #dff5f2;
+}
+
+.model-enums {
+  --accent: var(--red);
+  --accent-soft: var(--red-soft);
+}
+
+/* Tablas de enums: la constante es la primera columna */
+.enum-table td:first-child {
+  width: 26%;
+}
+
+.enum-table code {
+  font-weight: 700;
+}
+
+/* Mini leyenda de campos */
+.fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fields li {
+  padding: 5px 10px;
+  background: var(--head);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.fields li strong {
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 700;
+}
+
+/* Enlaces a las tarjetas del mapa */
+.map-link {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.map-link:hover {
+  text-decoration: underline;
+}
