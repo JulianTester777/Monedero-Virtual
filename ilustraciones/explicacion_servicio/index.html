@@ -24,7 +24,7 @@
       </p>
       <ul class="hero-stats">
         <li><strong>5</strong><span>clases</span></li>
-        <li><strong>32</strong><span>métodos</span></li>
+        <li><strong>39</strong><span>métodos</span></li>
         <li><strong>3</strong><span>estructuras propias</span></li>
         <li><strong>0</strong><span>dependencias externas</span></li>
       </ul>
@@ -251,6 +251,16 @@
                 <td>Delega en <code>ServicioPuntos.consultar</code>.</td>
               </tr>
               <tr>
+                <td class="sig"><code>consultarHistorialPuntos(String id)</code><span class="vis public">public</span></td>
+                <td>Devuelve el historial de movimientos de puntos del cliente.</td>
+                <td>Es la lista interna; delega en <code>ServicioPuntos.historial</code>.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>buscarMovimientoPuntos(String id, int transaccionId)</code><span class="vis public">public</span></td>
+                <td>Busca el movimiento de puntos generado por una transacción.</td>
+                <td>Devuelve <code>null</code> si no existe; se usará al revertir.</td>
+              </tr>
+              <tr>
                 <td class="sig"><code>consultarRango(String id)</code><span class="vis public">public</span></td>
                 <td>Valida que el cliente exista y devuelve su <code>Rango</code>.</td>
                 <td>Delega en <code>ServicioPuntos.consultarRango</code>; el rango se deriva de los puntos acumulados.</td>
@@ -259,6 +269,11 @@
                 <td class="sig"><code>ranking(int n)</code><span class="vis public">public</span></td>
                 <td>Devuelve los <code>n</code> clientes con más puntos.</td>
                 <td>Delega en <code>ServicioPuntos.top(n)</code>.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>rankingCompleto()</code><span class="vis public">public</span></td>
+                <td>Devuelve todos los clientes ordenados por puntos.</td>
+                <td>Delega en <code>ServicioPuntos.rankingCompleto</code>.</td>
               </tr>
               <tr>
                 <td class="sig"><code>getReloj()</code><span class="vis public">public</span></td>
@@ -323,7 +338,7 @@
           <ul>
             <li><code>Banco.depositar/retirar/transferir</code>: <code>otorgar(t)</code>.</li>
             <li><code>Banco.canjearBeneficio</code>: <code>canjear(id, beneficio, ahora)</code>.</li>
-            <li><code>Banco.consultarPuntos</code>, <code>Banco.consultarRango</code> y <code>Banco.ranking</code>.</li>
+            <li><code>Banco.consultarPuntos</code>, <code>Banco.consultarHistorialPuntos</code>, <code>Banco.buscarMovimientoPuntos</code>, <code>Banco.consultarRango</code>, <code>Banco.ranking</code> y <code>Banco.rankingCompleto</code>.</li>
           </ul>
         </article>
 
@@ -363,6 +378,16 @@
                 <td class="sig"><code>consultar(String id)</code><span class="vis public">public</span></td>
                 <td>Busca la cuenta de puntos por id.</td>
                 <td>Si no existe lanza <code>OperacionInvalidaException</code>. O(1) promedio.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>historial(String id)</code><span class="vis public">public</span></td>
+                <td>Devuelve el historial de movimientos de puntos.</td>
+                <td>Es la lista interna de <code>CuentaPuntos</code>.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>buscarMovimientoPorTransaccion(String id, int transaccionId)</code><span class="vis public">public</span></td>
+                <td>Busca el movimiento asociado a una transacción.</td>
+                <td>Recorre el historial; devuelve <code>null</code> si no existe.</td>
               </tr>
               <tr>
                 <td class="sig"><code>calcularRango(int puntosAcumulados)</code><span class="vis public">public</span></td>
@@ -420,6 +445,7 @@
           <li><code>calcularPuntos</code> usa división entera: 150 unidades dan 1 bloque; 99 dan 0.</li>
           <li><code>calcularRango</code> y <code>consultarRango</code> no modifican la cuenta: el rango se calcula al vuelo desde <code>acumulados</code>.</li>
           <li>Rangos: Bronce 0–500, Plata 501–1000, Oro 1001–5000, Platino 5001 o más.</li>
+          <li><code>historial</code> y <code>buscarMovimientoPorTransaccion</code> solo leen la lista interna de movimientos.</li>
           <li>Las transferencias recibidas y los bonos no generan puntos.</li>
           <li>El árbol guarda <code>EntradaPuntos</code>, no <code>Cliente</code>: la entrada es inmutable y se reemplaza al cambiar los puntos.</li>
           <li>El BST no se balancea: si los puntos crecen en orden, el ranking puede degenerar en lista.</li>
@@ -603,6 +629,16 @@
                 <td>Suma <code>dias</code> al desplazamiento con <code>Duration.plusDays</code>.</td>
                 <td>Acepta valores negativos (retrocede) y acumula entre llamadas.</td>
               </tr>
+              <tr>
+                <td class="sig"><code>avanzarHoras(long horas)</code><span class="vis public">public</span></td>
+                <td>Suma <code>horas</code> al desplazamiento con <code>Duration.plusHours</code>.</td>
+                <td>Apoyo para probar ejecuciones programadas.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>avanzarMinutos(long minutos)</code><span class="vis public">public</span></td>
+                <td>Suma <code>minutos</code> al desplazamiento con <code>Duration.plusMinutes</code>.</td>
+                <td>Apoyo para probar ejecuciones programadas.</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -612,7 +648,7 @@
         <h3>Detalles a tener en cuenta</h3>
         <ul>
           <li>El reloj no guarda una fecha fija: siempre parte de la hora real.</li>
-          <li>Avanzar días afecta a todas las cuentas y beneficios a la vez.</li>
+          <li>Avanzar días, horas o minutos afecta a todas las cuentas y beneficios a la vez.</li>
           <li>No hay zona horaria explícita: se usa la del sistema.</li>
         </ul>
       </article>
@@ -1014,7 +1050,7 @@
             <li><strong>Nulos en <code>transferir</code>:</strong> <code>idOrigen.equals(...)</code> se ejecuta antes de validar nulos; un id nulo produce <code>NullPointerException</code>.</li>
             <li><strong><code>calcularPuntos</code> público:</strong> no valida monto nulo ni negativo y <code>intValue()</code> puede desbordar.</li>
             <li><strong><code>Reloj</code> no es thread-safe:</strong> el desplazamiento mutable no está sincronizado.</li>
-            <li><strong>Estado expuesto:</strong> <code>getReloj</code> y <code>consultarHistorial</code> devuelven objetos mutables internos.</li>
+            <li><strong>Estado expuesto:</strong> <code>getReloj</code>, <code>consultarHistorial</code> y los historiales de puntos devuelven objetos mutables internos.</li>
             <li><strong><code>canjearBeneficio(null)</code>:</strong> termina en <code>NullPointerException</code> dentro de <code>ServicioPuntos.canjear</code>.</li>
             <li><strong>Validación duplicada:</strong> <code>ServicioPuntos.registrarCliente</code> y <code>consultar</code> confían en que <code>Banco</code> ya validó.</li>
           </ul>

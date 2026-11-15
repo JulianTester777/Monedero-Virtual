@@ -16,4 +16,8 @@ public class Reloj {
     public LocalDateTime ahora() { return LocalDateTime.now().plus(desplazamiento); }
 
     public void avanzarDias(long dias) { desplazamiento = desplazamiento.plusDays(dias); }
+
+    public void avanzarHoras(long horas) { desplazamiento = desplazamiento.plusHours(horas); }
+
+    public void avanzarMinutos(long minutos) { desplazamiento = desplazamiento.plusMinutes(minutos); }
 }
