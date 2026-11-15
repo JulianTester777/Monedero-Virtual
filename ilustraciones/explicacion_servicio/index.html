@@ -24,7 +24,7 @@
       </p>
       <ul class="hero-stats">
         <li><strong>5</strong><span>clases</span></li>
-        <li><strong>29</strong><span>métodos</span></li>
+        <li><strong>32</strong><span>métodos</span></li>
         <li><strong>3</strong><span>estructuras propias</span></li>
         <li><strong>0</strong><span>dependencias externas</span></li>
       </ul>
@@ -64,7 +64,7 @@
         <article class="map-card svc-banco">
           <span class="map-symbol" aria-hidden="true">B</span>
           <h3>Banco</h3>
-          <p>Fachada de negocio: registra clientes, mueve saldo, crea transacciones y delega los puntos.</p>
+          <p>Fachada de negocio: registra clientes, mueve saldo, crea transacciones, delega los puntos y consulta rangos.</p>
           <p class="map-use"><strong>Usa:</strong> TablaHash, ServicioPuntos, Reloj.</p>
           <div class="req-tags"><span class="tag">RF-01…RF-05</span><span class="tag">RA-01</span><span class="tag">RP-03</span></div>
         </article>
@@ -72,7 +72,7 @@
         <article class="map-card svc-puntos">
           <span class="map-symbol" aria-hidden="true">★</span>
           <h3>ServicioPuntos</h3>
-          <p>Calcula, otorga y canjea puntos, y mantiene el ranking en un árbol BST.</p>
+          <p>Calcula, otorga y canjea puntos, mantiene el ranking en un árbol BST y clasifica por rangos.</p>
           <p class="map-use"><strong>Usa:</strong> TablaHash y Arbol.</p>
           <div class="req-tags"><span class="tag">RA-01</span><span class="tag">RP-01</span><span class="tag">RP-03</span></div>
         </article>
@@ -251,6 +251,11 @@
                 <td>Delega en <code>ServicioPuntos.consultar</code>.</td>
               </tr>
               <tr>
+                <td class="sig"><code>consultarRango(String id)</code><span class="vis public">public</span></td>
+                <td>Valida que el cliente exista y devuelve su <code>Rango</code>.</td>
+                <td>Delega en <code>ServicioPuntos.consultarRango</code>; el rango se deriva de los puntos acumulados.</td>
+              </tr>
+              <tr>
                 <td class="sig"><code>ranking(int n)</code><span class="vis public">public</span></td>
                 <td>Devuelve los <code>n</code> clientes con más puntos.</td>
                 <td>Delega en <code>ServicioPuntos.top(n)</code>.</td>
@@ -295,12 +300,12 @@
           <h2>ServicioPuntos</h2>
           <p>
             Todo lo relacionado con los puntos: cuántos genera una transacción, cómo se suman,
-            cómo se canjean y cómo se mantiene el ranking. Usa una tabla hash para las cuentas
-            y un árbol BST para el orden por puntos.
+            cómo se canjean, cómo se mantiene el ranking y cómo se clasifica a cada cliente en
+            un rango. Usa una tabla hash para las cuentas y un árbol BST para el orden por puntos.
           </p>
         </div>
         <div class="req-tags">
-          <span class="tag">RA-01 · puntos</span>
+          <span class="tag">RA-01 · puntos y rangos</span>
           <span class="tag">RP-01 · historial</span>
           <span class="tag">RP-03 · canje</span>
         </div>
@@ -318,7 +323,7 @@
           <ul>
             <li><code>Banco.depositar/retirar/transferir</code>: <code>otorgar(t)</code>.</li>
             <li><code>Banco.canjearBeneficio</code>: <code>canjear(id, beneficio, ahora)</code>.</li>
-            <li><code>Banco.consultarPuntos</code> y <code>Banco.ranking</code>.</li>
+            <li><code>Banco.consultarPuntos</code>, <code>Banco.consultarRango</code> y <code>Banco.ranking</code>.</li>
           </ul>
         </article>
 
@@ -358,6 +363,16 @@
                 <td class="sig"><code>consultar(String id)</code><span class="vis public">public</span></td>
                 <td>Busca la cuenta de puntos por id.</td>
                 <td>Si no existe lanza <code>OperacionInvalidaException</code>. O(1) promedio.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>calcularRango(int puntosAcumulados)</code><span class="vis public">public</span></td>
+                <td>Devuelve el <code>Rango</code> que corresponde a esos puntos.</td>
+                <td>Es <code>static</code>; delega en <code>Rango.desdePuntos</code> y rechaza puntos negativos.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>consultarRango(String id)</code><span class="vis public">public</span></td>
+                <td>Devuelve el rango actual del cliente.</td>
+                <td>Consulta la cuenta y usa <code>CuentaPuntos.getRango</code>.</td>
               </tr>
               <tr>
                 <td class="sig"><code>calcularPuntos(TipoTransaccion tipo, BigDecimal monto)</code><span class="vis public">public</span></td>
@@ -403,6 +418,8 @@
         <h3>Detalles a tener en cuenta</h3>
         <ul>
           <li><code>calcularPuntos</code> usa división entera: 150 unidades dan 1 bloque; 99 dan 0.</li>
+          <li><code>calcularRango</code> y <code>consultarRango</code> no modifican la cuenta: el rango se calcula al vuelo desde <code>acumulados</code>.</li>
+          <li>Rangos: Bronce 0–500, Plata 501–1000, Oro 1001–5000, Platino 5001 o más.</li>
           <li>Las transferencias recibidas y los bonos no generan puntos.</li>
           <li>El árbol guarda <code>EntradaPuntos</code>, no <code>Cliente</code>: la entrada es inmutable y se reemplaza al cambiar los puntos.</li>
           <li>El BST no se balancea: si los puntos crecen en orden, el ranking puede degenerar en lista.</li>
@@ -947,9 +964,9 @@
               <td><code>Banco.consultarHistorial</code>.</td>
             </tr>
             <tr>
-              <td><strong>RA-01</strong><br><span class="muted">sistema de puntos</span></td>
+              <td><strong>RA-01</strong><br><span class="muted">sistema de puntos y rangos</span></td>
               <td><span class="status ok">Implementado</span></td>
-              <td><code>ServicioPuntos</code> con TablaHash + Arbol.</td>
+              <td><code>ServicioPuntos</code> con TablaHash + Arbol; <code>consultarRango</code> clasifica al cliente.</td>
             </tr>
             <tr>
               <td><strong>RP-01</strong><br><span class="muted">historial de puntos</span></td>
@@ -973,8 +990,8 @@
         <h2>Hallazgos de la revisión</h2>
       </div>
       <p>
-        Observaciones de calidad y diseño del paquete servicio. No se corrigió nada: el
-        análisis es de solo lectura.
+          Observaciones de calidad y diseño del paquete servicio. No se corrigieron estos
+          hallazgos: quedan como observaciones para el equipo.
       </p>
 
       <div class="findings">

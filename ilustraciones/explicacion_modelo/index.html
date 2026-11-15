@@ -22,10 +22,10 @@
         (esa vive en <code>servicio</code>).
       </p>
       <ul class="hero-stats">
-        <li><strong>8</strong><span>tipos del dominio</span></li>
+        <li><strong>9</strong><span>tipos del dominio</span></li>
         <li><strong>5</strong><span>clases</span></li>
-        <li><strong>3</strong><span>enums</span></li>
-        <li><strong>46</strong><span>métodos</span></li>
+        <li><strong>4</strong><span>enums</span></li>
+        <li><strong>53</strong><span>métodos</span></li>
       </ul>
     </div>
   </header>
@@ -103,8 +103,8 @@
         <article class="map-card model-enums">
           <span class="map-symbol" aria-hidden="true">≡</span>
           <h3>Enums del dominio</h3>
-          <p><code>Beneficio</code>, <code>TipoTransaccion</code> y <code>TipoMovimientoPuntos</code>: catálogos cerrados de opciones.</p>
-          <p class="map-use"><strong>Usados por:</strong> ServicioPuntos, Banco, Transaccion y MovimientoPuntos.</p>
+          <p><code>Beneficio</code>, <code>TipoTransaccion</code>, <code>TipoMovimientoPuntos</code> y <code>Rango</code>: catálogos cerrados de opciones.</p>
+          <p class="map-use"><strong>Usados por:</strong> ServicioPuntos, Banco, CuentaPuntos, Transaccion y MovimientoPuntos.</p>
           <div class="req-tags"><span class="tag">RA-01</span><span class="tag">RF-01…RF-05</span></div>
         </article>
       </div>
@@ -339,6 +339,11 @@
                 <td>Baja con <code>gastar</code>.</td>
               </tr>
               <tr>
+                <td class="sig"><code>getRango()</code><span class="vis public">public</span></td>
+                <td>Deriva el rango de <code>acumulados</code> con <code>Rango.desdePuntos</code>.</td>
+                <td>No cambia el estado; el rango no se almacena.</td>
+              </tr>
+              <tr>
                 <td class="sig"><code>getHistorial()</code><span class="vis public">public</span></td>
                 <td>Devuelve la <code>ListaEnlazada&lt;MovimientoPuntos&gt;</code> interna.</td>
                 <td>Referencia mutable.</td>
@@ -389,6 +394,7 @@
           <li>Los mutadores son <code>public</code> porque <code>ServicioPuntos</code> vive en otro paquete; el comentario del código lo aclara.</li>
           <li><code>gastar</code> no comprueba saldo: si se llama directo, <code>disponibles</code> puede quedar negativo.</li>
           <li>Separar <code>acumulados</code> de <code>disponibles</code> permite canjear sin perder el rango histórico.</li>
+          <li><code>getRango</code> se calcula al vuelo: no hay campo <code>rango</code> ni setter.</li>
         </ul>
       </article>
     </section>
@@ -743,10 +749,10 @@
       <div class="class-head">
         <div>
           <span class="badge-kind">Enums · catálogos</span>
-          <h2>Beneficio, TipoTransaccion y TipoMovimientoPuntos</h2>
+          <h2>Beneficio, TipoTransaccion, TipoMovimientoPuntos y Rango</h2>
           <p>
-            Tres catálogos cerrados que evitan usar textos o números sueltos. Los enums son
-            inmutables por definición y concentran costos, descripciones y clasificaciones.
+            Cuatro catálogos cerrados que evitan usar textos o números sueltos. Los enums son
+            inmutables por definición y concentran costos, descripciones, clasificaciones y rangos.
           </p>
         </div>
         <div class="req-tags">
@@ -885,12 +891,76 @@
         </div>
       </article>
 
+      <article class="card method-card">
+        <h3>Rango</h3>
+        <p>
+          Clasifica al cliente según sus puntos acumulados. No se guarda en
+          <code>CuentaPuntos</code>: se deriva con <code>Rango.desdePuntos</code> cada vez que
+          se consulta.
+        </p>
+        <div class="table-wrap">
+          <table class="enum-table">
+            <caption class="sr-only">Constantes de Rango</caption>
+            <thead>
+              <tr><th>Constante</th><th>Desde</th><th>Hasta</th><th>Nombre</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>BRONCE</code></td><td>0</td><td>500</td><td>Bronce</td></tr>
+              <tr><td><code>PLATA</code></td><td>501</td><td>1000</td><td>Plata</td></tr>
+              <tr><td><code>ORO</code></td><td>1001</td><td>5000</td><td>Oro</td></tr>
+              <tr><td><code>PLATINO</code></td><td>5001</td><td>∞</td><td>Platino</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-wrap" style="margin-top: 14px;">
+          <table>
+            <caption class="sr-only">Métodos de Rango</caption>
+            <thead>
+              <tr><th>Método</th><th>Qué hace</th><th>Efecto / notas</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="sig"><code>Rango(int desde, int hasta, String nombre)</code><span class="vis private">private</span></td>
+                <td>Constructor interno del enum: fija los límites y el nombre de cada constante.</td>
+                <td>No se puede invocar desde fuera.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>desdePuntos(int puntos)</code><span class="vis public">public</span></td>
+                <td>Devuelve el rango cuyo <code>hasta</code> cubre los puntos.</td>
+                <td>Es <code>static</code>; lanza <code>IllegalArgumentException</code> si los puntos son negativos.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>getDesde()</code><span class="vis public">public</span></td>
+                <td>Devuelve el límite inferior del rango.</td>
+                <td>Incluido.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>getHasta()</code><span class="vis public">public</span></td>
+                <td>Devuelve el límite superior del rango.</td>
+                <td>Incluido; en <code>PLATINO</code> es <code>Integer.MAX_VALUE</code>.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>getNombre()</code><span class="vis public">public</span></td>
+                <td>Devuelve el nombre legible: «Bronce», «Plata», «Oro» o «Platino».</td>
+                <td>Se usa al imprimir.</td>
+              </tr>
+              <tr>
+                <td class="sig"><code>toString()</code><span class="vis public">public</span></td>
+                <td>Devuelve el mismo nombre legible.</td>
+                <td>Facilita imprimir el rango directamente.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
       <article class="card notes">
         <h3>Detalles a tener en cuenta</h3>
         <ul>
           <li>Los enums no tienen setters: sus valores son fijos.</li>
           <li>El costo y la descripción de <code>Beneficio</code> viven en un solo lugar; si cambian, cambia la demo y el servicio a la vez.</li>
           <li>La regla de puntos por tipo no está en el enum, sino en <code>ServicioPuntos</code>.</li>
+          <li>El rango no se persiste: <code>CuentaPuntos.getRango</code> lo calcula desde <code>acumulados</code>; la reversión de transacciones aún no está implementada.</li>
         </ul>
       </article>
     </section>
@@ -913,6 +983,7 @@
         <li><strong>MovimientoPuntos</strong> → usa <strong>TipoMovimientoPuntos</strong> y referencia el id de una <strong>Transaccion</strong>.</li>
         <li><strong>EntradaPuntos</strong> → es el elemento que ordena <code>Arbol</code> para el ranking.</li>
         <li><strong>Beneficio</strong> → lo lee <code>ServicioPuntos.canjear</code>; el efecto se aplica en <code>CuentaPuntos</code> y <code>Banco</code>.</li>
+        <li><strong>Rango</strong> → se deriva de <code>CuentaPuntos.acumulados</code>; no se almacena ni se modifica al canjear.</li>
       </ul>
 
       <div class="grid-2">
@@ -972,9 +1043,9 @@
               <td><code>Transaccion</code> y <code>TipoTransaccion</code> describen cada operación.</td>
             </tr>
             <tr>
-              <td><strong>RA-01</strong><br><span class="muted">sistema de puntos</span></td>
+              <td><strong>RA-01</strong><br><span class="muted">sistema de puntos y rangos</span></td>
               <td><span class="status ok">Implementado</span></td>
-              <td><code>CuentaPuntos</code> y <code>EntradaPuntos</code> sostienen el ranking.</td>
+              <td><code>CuentaPuntos</code> y <code>EntradaPuntos</code> sostienen el ranking; <code>CuentaPuntos.getRango</code> clasifica al cliente.</td>
             </tr>
             <tr>
               <td><strong>RP-01</strong><br><span class="muted">registro e historial de puntos</span></td>
@@ -998,8 +1069,8 @@
         <h2>Hallazgos de la revisión</h2>
       </div>
       <p>
-        Observaciones de calidad y diseño del paquete modelo. No se corrigió nada: el
-        análisis es de solo lectura.
+          Observaciones de calidad y diseño del paquete modelo. No se corrigieron estos
+          hallazgos: quedan como observaciones para el equipo.
       </p>
 
       <div class="findings">
@@ -1023,6 +1094,7 @@
             <li><strong>Contador estático:</strong> <code>Transaccion.contador</code> es global, no <em>thread-safe</em> y se reinicia por JVM.</li>
             <li><strong>Sin <code>equals</code>/<code>hashCode</code>:</strong> <code>Cliente</code>, <code>Transaccion</code> y <code>MovimientoPuntos</code> usan identidad por objeto.</li>
             <li><strong>Sin validación de puntos negativos</strong> en el constructor de <code>MovimientoPuntos</code>.</li>
+            <li><strong>Reversión pendiente:</strong> no hay método para revertir una transacción ni recalcular puntos; <code>Rango</code> se actualizará solo porque se deriva de <code>acumulados</code>.</li>
           </ul>
         </article>
       </div>
