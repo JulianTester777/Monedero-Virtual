@@ -31,6 +31,19 @@ public class ServicioPuntos {
         return c;
     }
 
+    /** Historial de movimientos de puntos del cliente. */
+    public ListaEnlazada<MovimientoPuntos> historial(String id) {
+        return consultar(id).getHistorial();
+    }
+
+    /** Movimiento de puntos generado por una transaccion, o null si no existe. */
+    public MovimientoPuntos buscarMovimientoPorTransaccion(String id, int transaccionId) {
+        for (MovimientoPuntos m : consultar(id).getHistorial()) {
+            if (m.getTransaccionId() == transaccionId) return m;
+        }
+        return null;
+    }
+
     /** Rango que corresponde a una cantidad de puntos acumulados. */
     public static Rango calcularRango(int puntosAcumulados) {
         return Rango.desdePuntos(puntosAcumulados);

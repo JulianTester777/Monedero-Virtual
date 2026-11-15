@@ -100,10 +100,24 @@ public class Banco {
 
     public CuentaPuntos consultarPuntos(String id) { buscarCliente(id); return puntos.consultar(id); }
 
+    /** Historial de movimientos de puntos del cliente. */
+    public ListaEnlazada<MovimientoPuntos> consultarHistorialPuntos(String id) {
+        buscarCliente(id);
+        return puntos.historial(id);
+    }
+
+    /** Movimiento de puntos generado por una transaccion, o null si no existe. */
+    public MovimientoPuntos buscarMovimientoPuntos(String id, int transaccionId) {
+        buscarCliente(id);
+        return puntos.buscarMovimientoPorTransaccion(id, transaccionId);
+    }
+
     /** Rango actual del cliente segun sus puntos acumulados. */
     public Rango consultarRango(String id) { buscarCliente(id); return puntos.consultarRango(id); }
 
     public ListaEnlazada<EntradaPuntos> ranking(int n) { return puntos.top(n); }
+
+    public ListaEnlazada<EntradaPuntos> rankingCompleto() { return puntos.rankingCompleto(); }
 
     public Reloj getReloj() { return reloj; }
 

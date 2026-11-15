@@ -11,7 +11,8 @@
 - Implementado: depósitos, retiros, transferencias, consultas, historial de transacciones, puntos, canje, rangos, ranking, comisiones y reloj simulado.
 - Implementado con límite: el ranking usa un BST sin balanceo (`src/main/java/estructuras/Arbol.java:4-8`); el rango ya se calcula, pero no hay beneficios automáticos por rango.
 - No implementado: reversión, transacciones programadas, alertas, patrones de gasto, varios monederos, integridad y UI.
-- El historial de puntos existe en `CuentaPuntos` (`src/main/java/modelo/CuentaPuntos.java:28`), pero no está expuesto por `ServicioPuntos` ni por `Banco`.
+- Se agregaron `ServicioPuntos.historial`, `ServicioPuntos.buscarMovimientoPorTransaccion`, `Banco.consultarHistorialPuntos`, `Banco.buscarMovimientoPuntos` y `Banco.rankingCompleto`.
+- Se agregaron `Reloj.avanzarHoras` y `Reloj.avanzarMinutos` como apoyo para las programadas.
 - Hay 49 pruebas actuales. No se amplía la suite hasta cerrar la lógica.
 
 ## Estructuras que faltan (prerrequisito)
@@ -28,11 +29,14 @@ No reemplazar las estructuras propias por `java.util`.
 
 **Requisito:** sistema de puntos, acumulación e historial.
 
-- [ ] `ServicioPuntos.historial(String id)` → `ListaEnlazada<MovimientoPuntos>`.
-- [ ] `Banco.consultarHistorialPuntos(String id)` → `ListaEnlazada<MovimientoPuntos>`.
-- [ ] `ServicioPuntos.buscarMovimientoPorTransaccion(String id, int transaccionId)` → `MovimientoPuntos` o `null`.
+- [x] `ServicioPuntos.historial(String id)` → `ListaEnlazada<MovimientoPuntos>`.
+- [x] `Banco.consultarHistorialPuntos(String id)` → `ListaEnlazada<MovimientoPuntos>`.
+- [x] `ServicioPuntos.buscarMovimientoPorTransaccion(String id, int transaccionId)` → `MovimientoPuntos` o `null`.
+- [x] `Banco.buscarMovimientoPuntos(String id, int transaccionId)` → `MovimientoPuntos` o `null`.
 
 **Criterio:** devuelve el historial sin modificarlo; si el cliente no existe, lanza `OperacionInvalidaException`. Es el cierre más pequeño y se puede hacer antes que el resto.
+
+**Estado:** implementado; pendiente de pruebas y de la reversión que lo usará.
 
 ## 2. Reversión de transacciones
 
@@ -81,7 +85,7 @@ No reemplazar las estructuras propias por `java.util`.
 - [ ] `Banco.procesarProgramadas()` o `Banco.procesarHasta(LocalDateTime)`.
 - [ ] `Banco.cancelarProgramada(int id)`.
 - [ ] `Banco.consultarProgramadas(String idCliente)`.
-- [ ] `Reloj.avanzarHoras` o `Reloj.avanzarMinutos` si la ejecución lo necesita.
+- [x] `Reloj.avanzarHoras` y `Reloj.avanzarMinutos` (apoyo listo; las programadas siguen pendientes).
 
 **Criterio:** cada programada se ejecuta una sola vez cuando vence, usa el saldo disponible en ese momento, respeta la recurrencia y no se duplica. Si falla, debe quedar registrada para una alerta.
 
