@@ -1,0 +1,14 @@
+/* Pantalla de acceso. */
+
+.login-view {
+    -fx-background-color: -fx-app-bg;
+    -fx-padding: 44 56 44 56;
+}
+
+.login-view--compact {
+    -fx-padding: 20 18 28 18;
+}
+
+.login-form {
+    -fx-max-width: 440;
+}

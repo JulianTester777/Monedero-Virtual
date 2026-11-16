@@ -1,0 +1,57 @@
+/* Contenedor del dashboard y navegación entre vistas. */
+
+.dashboard-view {
+    -fx-background-color: -fx-app-bg;
+    -fx-padding: 26 34 34 34;
+}
+
+.dashboard-view--compact {
+    -fx-padding: 18 16 26 16;
+}
+
+.dashboard-header {
+    -fx-padding: 0 0 4 0;
+}
+
+.dashboard-nav {
+    -fx-padding: 0 0 4 0;
+}
+
+.nav-tab {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-border-radius: 8;
+    -fx-border-width: 2;
+    -fx-padding: 8 12;
+    -fx-text-fill: -fx-app-muted;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.nav-tab:hover {
+    -fx-background-color: -fx-app-surface-2;
+    -fx-text-fill: -fx-app-pine;
+}
+
+.nav-tab:selected {
+    -fx-background-color: -fx-app-pine;
+    -fx-text-fill: -fx-app-on-pine;
+}
+
+.nav-tab:selected:hover {
+    -fx-background-color: -fx-app-pine-2;
+    -fx-text-fill: -fx-app-on-pine;
+}
+
+.nav-tab:focused {
+    -fx-border-color: -fx-app-saffron;
+    -fx-padding: 8 12;
+}
+
+.dashboard-content {
+    -fx-background-color: transparent;
+    -fx-padding: 2 8 12 2;
+}

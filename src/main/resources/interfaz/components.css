@@ -1,0 +1,301 @@
+/* Componentes compartidos: scroll, paneles, listas, feedback y combo. */
+
+.content-scroll {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-background-insets: 0;
+}
+
+.content-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.content-scroll:focused {
+    -fx-background-color: transparent;
+}
+
+.content-scroll .scroll-bar {
+    -fx-background-color: transparent;
+    -fx-padding: 2;
+}
+
+.content-scroll .scroll-bar .track {
+    -fx-background-color: transparent;
+}
+
+.content-scroll .scroll-bar .thumb {
+    -fx-background-color: rgba(18, 59, 50, 0.20);
+    -fx-background-radius: 6;
+}
+
+.content-scroll .scroll-bar .increment-button,
+.content-scroll .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-opacity: 0;
+}
+
+.action-panel,
+.ranking-panel {
+    -fx-background-color: -fx-app-surface;
+    -fx-background-radius: 14;
+    -fx-border-color: -fx-app-line;
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(18, 59, 50, 0.06), 16, 0, 0, 6);
+}
+
+.dashboard-view--compact .action-panel,
+.dashboard-view--compact .ranking-panel {
+    -fx-padding: 18;
+}
+
+.operation-tab {
+    -fx-background-color: transparent;
+    -fx-background-radius: 7;
+    -fx-background-insets: 0;
+    -fx-border-color: -fx-app-line;
+    -fx-border-radius: 7;
+    -fx-border-width: 1;
+    -fx-padding: 8 11;
+    -fx-text-fill: -fx-app-muted;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.operation-tab:hover {
+    -fx-background-color: -fx-app-surface-2;
+    -fx-text-fill: -fx-app-pine;
+}
+
+.operation-tab:selected {
+    -fx-background-color: -fx-app-pine;
+    -fx-border-color: -fx-app-pine;
+    -fx-text-fill: -fx-app-on-pine;
+}
+
+.operation-tab:selected:hover {
+    -fx-background-color: -fx-app-pine-2;
+    -fx-text-fill: -fx-app-on-pine;
+}
+
+.operation-tab:focused {
+    -fx-border-color: -fx-app-saffron;
+    -fx-border-width: 2;
+    -fx-padding: 7 10;
+}
+
+.combo-box {
+    -fx-background-color: -fx-app-surface;
+    -fx-background-radius: 8;
+    -fx-border-color: -fx-app-line;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 1;
+}
+
+.combo-box > .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-app-ink;
+    -fx-padding: 9 10;
+}
+
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 9 0 0;
+}
+
+.combo-box .arrow {
+    -fx-background-color: -fx-app-pine;
+}
+
+.combo-box:focused {
+    -fx-border-color: -fx-app-saffron;
+    -fx-border-width: 2;
+    -fx-padding: 0;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: -fx-app-surface;
+    -fx-background-radius: 8;
+    -fx-border-color: -fx-app-line;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+
+.combo-box-popup .list-view .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-app-ink;
+    -fx-padding: 9 10;
+}
+
+.combo-box-popup .list-view .list-cell:filled:hover {
+    -fx-background-color: -fx-app-surface-2;
+}
+
+.combo-box-popup .list-view .list-cell:filled:selected {
+    -fx-background-color: -fx-app-pine;
+    -fx-text-fill: -fx-app-on-pine;
+}
+
+.form-error {
+    -fx-background-color: #F8E6E2;
+    -fx-background-radius: 8;
+    -fx-border-color: #E7BDB4;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 10 12;
+    -fx-text-fill: -fx-app-error;
+    -fx-font-size: 13px;
+}
+
+.feedback {
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 10 12;
+    -fx-font-size: 13px;
+}
+
+.feedback--ok {
+    -fx-background-color: #E3F0E8;
+    -fx-border-color: #B9D8C6;
+    -fx-text-fill: #1B5A3F;
+}
+
+.feedback--error {
+    -fx-background-color: #F8E6E2;
+    -fx-border-color: #E7BDB4;
+    -fx-text-fill: -fx-app-error;
+}
+
+.list-view {
+    -fx-background-color: transparent;
+    -fx-background-radius: 10;
+    -fx-background-insets: 0;
+    -fx-border-color: -fx-app-line;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-padding: 4;
+}
+
+.list-view:focused {
+    -fx-border-color: -fx-app-saffron;
+    -fx-border-width: 2;
+}
+
+.list-view .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.list-view .list-cell:filled:hover {
+    -fx-background-color: rgba(220, 232, 225, 0.70);
+    -fx-background-radius: 8;
+}
+
+.list-view .list-cell:filled:selected,
+.list-view .list-cell:filled:selected:hover {
+    -fx-background-color: -fx-app-surface-2;
+    -fx-background-radius: 8;
+}
+
+.list-view .list-cell:focused {
+    -fx-border-color: transparent;
+}
+
+.list-view .placeholder .label {
+    -fx-text-fill: -fx-app-muted;
+    -fx-font-size: 13px;
+}
+
+.list-view .scroll-bar {
+    -fx-background-color: transparent;
+    -fx-padding: 2;
+}
+
+.list-view .scroll-bar .track {
+    -fx-background-color: transparent;
+}
+
+.list-view .scroll-bar .thumb {
+    -fx-background-color: rgba(18, 59, 50, 0.18);
+    -fx-background-radius: 4;
+}
+
+.list-view .scroll-bar .increment-button,
+.list-view .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-opacity: 0;
+}
+
+.movement-row {
+    -fx-padding: 11 4;
+}
+
+.movement-type {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-app-ink;
+}
+
+.movement-meta {
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-app-muted;
+}
+
+.movement-amount {
+    -fx-font-family: "Bahnschrift";
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.movement-amount--in {
+    -fx-text-fill: #1F6B4A;
+}
+
+.movement-amount--out {
+    -fx-text-fill: #8A3B2F;
+}
+
+.movement-points {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-app-pine;
+}
+
+.ranking-row {
+    -fx-padding: 10 4;
+    -fx-border-color: -fx-app-line;
+    -fx-border-width: 0 0 1 0;
+}
+
+.ranking-row--me {
+    -fx-background-color: -fx-app-surface-2;
+    -fx-background-radius: 8;
+    -fx-padding: 10 8;
+}
+
+.ranking-position {
+    -fx-font-family: "Bahnschrift";
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-app-muted;
+    -fx-min-width: 22;
+    -fx-alignment: center;
+}
+
+.ranking-name {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-app-ink;
+}
+
+.ranking-points {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-app-pine;
+}

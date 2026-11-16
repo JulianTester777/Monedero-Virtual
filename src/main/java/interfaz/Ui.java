@@ -1,7 +1,7 @@
 package interfaz;
 
-import modelo.Beneficio;
-import modelo.TipoTransaccion;
+import javafx.scene.control.Label;
+import modelo.Recurrencia;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -16,6 +16,7 @@ final class Ui {
     private static final NumberFormat MONTO = NumberFormat.getNumberInstance(ES);
     private static final NumberFormat PUNTOS = NumberFormat.getIntegerInstance(ES);
     private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("d MMM, HH:mm", ES);
+    private static final DateTimeFormatter FECHA_HORA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     static {
         MONTO.setMinimumFractionDigits(2);
@@ -36,28 +37,36 @@ final class Ui {
         return FECHA.format(valor);
     }
 
-    static String nombreTipo(TipoTransaccion tipo) {
-        return switch (tipo) {
-            case DEPOSITO -> "Depósito";
-            case RETIRO -> "Retiro";
-            case TRANSFERENCIA_ENVIADA -> "Transferencia enviada";
-            case TRANSFERENCIA_RECIBIDA -> "Transferencia recibida";
-            case BONO -> "Bono de saldo";
+    static LocalDateTime parseFecha(String texto) {
+        if (texto == null || texto.isBlank()) {
+            throw new IllegalArgumentException("La fecha es obligatoria.");
+        }
+        return LocalDateTime.parse(texto.trim(), FECHA_HORA);
+    }
+
+    static String nombreRecurrencia(Recurrencia recurrencia) {
+        return switch (recurrencia) {
+            case NINGUNA -> "No se repite";
+            case DIARIA -> "Diaria";
+            case SEMANAL -> "Semanal";
+            case MENSUAL -> "Mensual";
         };
     }
 
-    static boolean esEntrada(TipoTransaccion tipo) {
-        return tipo == TipoTransaccion.DEPOSITO
-                || tipo == TipoTransaccion.TRANSFERENCIA_RECIBIDA
-                || tipo == TipoTransaccion.BONO;
+    static void mostrarFeedback(Label etiqueta, String texto, boolean exito) {
+        etiqueta.setText(texto);
+        etiqueta.setAccessibleText(texto);
+        etiqueta.getStyleClass().removeAll("feedback--ok", "feedback--error");
+        etiqueta.getStyleClass().add(exito ? "feedback--ok" : "feedback--error");
+        etiqueta.setVisible(true);
+        etiqueta.setManaged(true);
     }
 
-    static String beneficio(Beneficio beneficio) {
-        String descripcion = beneficio.getDescripcion();
-        if (descripcion.endsWith(".")) {
-            descripcion = descripcion.substring(0, descripcion.length() - 1);
-        }
-        return descripcion + " (" + puntos(beneficio.getCosto()) + " pts)";
+    static void ocultarFeedback(Label etiqueta) {
+        etiqueta.setText("");
+        etiqueta.setAccessibleText("");
+        etiqueta.setVisible(false);
+        etiqueta.setManaged(false);
     }
 
     static BigDecimal parseMonto(String texto) {

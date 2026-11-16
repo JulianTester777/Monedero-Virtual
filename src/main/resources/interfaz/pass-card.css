@@ -1,0 +1,177 @@
+/* Tarjeta de pase y escalera de rangos. */
+
+.pass-card {
+    -fx-background-color: -fx-app-saffron, -fx-app-pine;
+    -fx-background-insets: 0, 5 0 0 0;
+    -fx-background-radius: 18, 0 0 18 18;
+    -fx-border-color: rgba(244, 247, 243, 0.10);
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(18, 59, 50, 0.22), 28, 0.10, 0, 12);
+}
+
+.pass-card--compact {
+    -fx-padding: 22;
+}
+
+.pass-card .wordmark {
+    -fx-text-fill: -fx-app-on-pine;
+}
+
+.pass-kicker {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-app-on-pine-muted;
+}
+
+.pass-lead {
+    -fx-font-size: 16px;
+    -fx-text-fill: -fx-app-on-pine;
+}
+
+.pass-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-app-on-pine-muted;
+}
+
+.pass-balance {
+    -fx-font-family: "Bahnschrift";
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-app-on-pine;
+}
+
+.pass-points {
+    -fx-font-family: "Bahnschrift";
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-app-saffron;
+}
+
+.pass-range {
+    -fx-font-family: "Bahnschrift";
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-app-on-pine;
+}
+
+.pass-hint {
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-app-on-pine-muted;
+}
+
+.pass-foot {
+    -fx-font-size: 11px;
+    -fx-text-fill: -fx-app-on-pine-muted;
+}
+
+.pass-perforation {
+    -fx-border-color: rgba(244, 247, 243, 0.22);
+    -fx-border-width: 1 0 0 0;
+    -fx-border-style: dashed;
+    -fx-min-height: 1;
+    -fx-pref-height: 1;
+}
+
+.pass-card--compact .pass-balance {
+    -fx-font-size: 30px;
+}
+
+.pass-card--compact .pass-points,
+.pass-card--compact .pass-range {
+    -fx-font-size: 18px;
+}
+
+.range-step {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-padding: 6 8;
+}
+
+.range-step--active {
+    -fx-background-color: rgba(226, 167, 46, 0.16);
+}
+
+.range-bar {
+    -fx-background-radius: 2;
+}
+
+.range-name {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-app-on-pine;
+}
+
+.range-threshold {
+    -fx-font-size: 11px;
+    -fx-text-fill: -fx-app-on-pine-muted;
+}
+
+.range-state {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-app-saffron;
+}
+
+.range-pill {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-padding: 7 6 6 6;
+}
+
+.range-pill--active {
+    -fx-background-color: rgba(226, 167, 46, 0.16);
+}
+
+.range-pill-bar {
+    -fx-background-radius: 2;
+}
+
+.range-pill-name {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-app-on-pine;
+}
+
+.range-pill-limit {
+    -fx-font-size: 10px;
+    -fx-text-fill: -fx-app-on-pine-muted;
+}
+
+.range--bronce .range-bar,
+.range--bronce .range-pill-bar {
+    -fx-background-color: #B07A4A;
+}
+
+.range--plata .range-bar,
+.range--plata .range-pill-bar {
+    -fx-background-color: #9AA7A3;
+}
+
+.range--oro .range-bar,
+.range--oro .range-pill-bar {
+    -fx-background-color: #D2A33C;
+}
+
+.range--platino .range-bar,
+.range--platino .range-pill-bar {
+    -fx-background-color: #5C8F87;
+}
+
+.range-progress {
+    -fx-accent: -fx-app-saffron;
+    -fx-pref-height: 6;
+}
+
+.range-progress > .track {
+    -fx-background-color: rgba(244, 247, 243, 0.22);
+    -fx-background-radius: 3;
+}
+
+.range-progress > .bar {
+    -fx-background-color: -fx-app-saffron;
+    -fx-background-radius: 3;
+    -fx-background-insets: 0;
+    -fx-padding: 3;
+}

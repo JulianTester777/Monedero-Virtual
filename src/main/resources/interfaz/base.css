@@ -1,0 +1,179 @@
+/* Variables, tipografía y controles comunes. */
+
+.root {
+    -fx-app-bg: #E7EEE9;
+    -fx-app-surface: #F4F7F3;
+    -fx-app-surface-2: #DCE8E1;
+    -fx-app-ink: #14201B;
+    -fx-app-muted: #53645C;
+    -fx-app-pine: #123B32;
+    -fx-app-pine-2: #1B4A3F;
+    -fx-app-saffron: #E2A72E;
+    -fx-app-error: #A33A2E;
+    -fx-app-line: #C9D8CF;
+    -fx-app-on-pine: #F4F7F3;
+    -fx-app-on-pine-muted: #B7C9C0;
+
+    -fx-background-color: -fx-app-bg;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 14px;
+    -fx-text-fill: -fx-app-ink;
+    -fx-focus-color: -fx-app-saffron;
+    -fx-faint-focus-color: rgba(226, 167, 46, 0.20);
+}
+
+.display-title {
+    -fx-font-family: "Bahnschrift";
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-app-ink;
+}
+
+.login-view--compact .display-title,
+.dashboard-view--compact .display-title {
+    -fx-font-size: 27px;
+}
+
+.lead {
+    -fx-font-size: 15px;
+    -fx-text-fill: -fx-app-muted;
+}
+
+.section-title {
+    -fx-font-family: "Bahnschrift";
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-app-pine;
+}
+
+.hint {
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-app-muted;
+}
+
+.field-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-app-pine;
+    -fx-padding: 0 0 1 0;
+}
+
+.fine-print {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6A7A72;
+}
+
+.text-field {
+    -fx-background-color: -fx-app-surface;
+    -fx-background-radius: 8;
+    -fx-background-insets: 0;
+    -fx-border-color: -fx-app-line;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 12 13;
+    -fx-text-fill: -fx-app-ink;
+    -fx-prompt-text-fill: #7B8A83;
+    -fx-highlight-fill: -fx-app-saffron;
+    -fx-highlight-text-fill: -fx-app-pine;
+}
+
+.text-field:focused {
+    -fx-border-color: -fx-app-saffron;
+    -fx-border-width: 2;
+    -fx-padding: 11 12;
+}
+
+.amount-field {
+    -fx-font-family: "Bahnschrift";
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.chip {
+    -fx-background-color: transparent;
+    -fx-background-radius: 20;
+    -fx-background-insets: 0;
+    -fx-border-color: -fx-app-line;
+    -fx-border-radius: 20;
+    -fx-border-width: 1;
+    -fx-padding: 8 13;
+    -fx-text-fill: -fx-app-pine;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.chip:hover {
+    -fx-background-color: -fx-app-surface-2;
+}
+
+.chip:pressed {
+    -fx-background-color: #CEDFD5;
+}
+
+.chip:focused {
+    -fx-border-color: -fx-app-saffron;
+    -fx-border-width: 2;
+    -fx-padding: 7 12;
+}
+
+.primary-button {
+    -fx-background-color: -fx-app-pine;
+    -fx-background-radius: 8;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-border-radius: 8;
+    -fx-border-width: 2;
+    -fx-padding: 12 17;
+    -fx-text-fill: -fx-app-on-pine;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.primary-button:hover {
+    -fx-background-color: -fx-app-pine-2;
+}
+
+.primary-button:pressed {
+    -fx-background-color: #0E2F28;
+}
+
+.primary-button:focused {
+    -fx-border-color: -fx-app-saffron;
+}
+
+.secondary-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-background-insets: 0;
+    -fx-border-color: -fx-app-line;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 8 13;
+    -fx-text-fill: -fx-app-pine;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.secondary-button:hover {
+    -fx-background-color: -fx-app-surface-2;
+}
+
+.secondary-button:focused {
+    -fx-border-color: -fx-app-saffron;
+    -fx-border-width: 2;
+    -fx-padding: 7 12;
+}
+
+.wordmark {
+    -fx-font-family: "Bahnschrift";
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-app-pine;
+}
+
+.wordmark--small {
+    -fx-font-size: 19px;
+}

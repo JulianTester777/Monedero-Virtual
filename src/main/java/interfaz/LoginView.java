@@ -70,9 +70,22 @@ final class LoginView extends BorderPane {
         intro.getStyleClass().add("lead");
         intro.setWrapText(true);
 
-        Label etiquetaId = new Label("ID de cliente");
-        etiquetaId.getStyleClass().add("field-label");
-        etiquetaId.setLabelFor(idCampo);
+        Label demo = new Label("IDs de demostración");
+        demo.getStyleClass().add("hint");
+
+        configurarError();
+
+        VBox formulario = new VBox(16, titulo, intro, construirCampoId(), demo,
+                construirChipsDemo(), construirBotonEntrar(), error, construirNota());
+        formulario.getStyleClass().add("login-form");
+        formulario.setMaxWidth(440);
+        return formulario;
+    }
+
+    private VBox construirCampoId() {
+        Label etiqueta = new Label("ID de cliente");
+        etiqueta.getStyleClass().add("field-label");
+        etiqueta.setLabelFor(idCampo);
 
         idCampo.getStyleClass().add("text-field");
         idCampo.setPromptText("Ej. ana");
@@ -80,44 +93,49 @@ final class LoginView extends BorderPane {
         idCampo.setOnAction(evento -> intentarEntrar());
         idCampo.textProperty().addListener((obs, anterior, actual) -> ocultarError());
 
-        VBox campoId = new VBox(6, etiquetaId, idCampo);
+        return new VBox(6, etiqueta, idCampo);
+    }
 
-        Label demo = new Label("IDs de demostración");
-        demo.getStyleClass().add("hint");
-
+    private HBox construirChipsDemo() {
         HBox chips = new HBox(8);
         for (String id : List.of("ana", "bruno", "carla")) {
             Button chip = new Button(id);
             chip.getStyleClass().add("chip");
             chip.setAccessibleText("Usar el ID de demostración " + id);
-            chip.setOnAction(evento -> {
-                idCampo.setText(id);
-                idCampo.requestFocus();
-                idCampo.end();
-            });
+            chip.setOnAction(evento -> usarDemo(id));
             chips.getChildren().add(chip);
         }
+        return chips;
+    }
 
+    private void usarDemo(String id) {
+        idCampo.setText(id);
+        idCampo.requestFocus();
+        idCampo.end();
+    }
+
+    private Button construirBotonEntrar() {
         Button entrar = new Button("Entrar");
         entrar.getStyleClass().add("primary-button");
         entrar.setMaxWidth(Double.MAX_VALUE);
         entrar.setDefaultButton(true);
         entrar.setOnAction(evento -> intentarEntrar());
+        return entrar;
+    }
 
+    private void configurarError() {
         error.getStyleClass().add("form-error");
         error.setWrapText(true);
         error.setVisible(false);
         error.setManaged(false);
         error.setAccessibleRole(AccessibleRole.TEXT);
+    }
 
+    private Label construirNota() {
         Label nota = new Label("Esta demo no pide contraseña: el ID abre la cuenta.");
         nota.getStyleClass().add("fine-print");
         nota.setWrapText(true);
-
-        VBox formulario = new VBox(16, titulo, intro, campoId, demo, chips, entrar, error, nota);
-        formulario.getStyleClass().add("login-form");
-        formulario.setMaxWidth(440);
-        return formulario;
+        return nota;
     }
 
     private void intentarEntrar() {

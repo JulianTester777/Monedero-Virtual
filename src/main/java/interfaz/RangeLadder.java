@@ -47,9 +47,9 @@ final class RangeLadder extends StackPane {
         horizontal.setManaged(compacto);
     }
 
-    void setRango(Rango actual) {
-        for (RangeStep paso : verticalSteps) paso.setActivo(paso.rango == actual);
-        for (CompactStep paso : horizontalSteps) paso.setActivo(paso.rango == actual);
+    void setRango(String actual) {
+        for (RangeStep paso : verticalSteps) paso.setActivo(paso.rango.getNombre().equals(actual));
+        for (CompactStep paso : horizontalSteps) paso.setActivo(paso.rango.getNombre().equals(actual));
     }
 
     private static String claseRango(Rango rango) {
