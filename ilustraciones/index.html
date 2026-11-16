@@ -20,10 +20,10 @@
         (<code>servicio</code>), método por método.
       </p>
       <ul class="hero-stats">
-        <li><strong>3</strong><span>TAD propios</span></li>
-        <li><strong>9</strong><span>tipos de dominio</span></li>
+        <li><strong>8</strong><span>TAD propios</span></li>
+        <li><strong>17</strong><span>tipos de dominio</span></li>
         <li><strong>3</strong><span>guías visuales</span></li>
-        <li><strong>49</strong><span>pruebas JUnit</span></li>
+        <li><strong>89</strong><span>pruebas JUnit</span></li>
       </ul>
     </div>
   </header>
@@ -45,10 +45,11 @@
           <span class="map-symbol" aria-hidden="true">A ↔ B</span>
           <h3>Paquete <code>estructuras</code></h3>
           <p>
-            Lista enlazada, tabla hash y árbol BST implementados a mano. La base de los
-            historiales, el acceso por id y el ranking de puntos.
+            Ocho TAD implementados a mano: listas, tabla hash, árbol BST/AVL, pila, cola
+            de prioridad, lista circular y grafo dirigido. La base de los historiales, el
+            acceso por id, el ranking, las reversiones, las programadas y los reportes.
           </p>
-          <p class="map-use"><strong>Incluye:</strong> 3 clases, 37 métodos y miembros, complejidades.</p>
+          <p class="map-use"><strong>Incluye:</strong> 8 clases, complejidades y relación con los requerimientos.</p>
           <div class="req-tags"><span class="tag">RF</span><span class="tag">RA</span><span class="tag">RP</span></div>
           <span class="hub-arrow">Abrir guía de estructuras →</span>
         </a>
@@ -93,15 +94,15 @@
         <li><strong>estructuras</strong> → los TAD propios. No conocen el dominio: son genéricos (<code>&lt;T&gt;</code>, <code>&lt;K, V&gt;</code>).</li>
         <li><strong>modelo</strong> → los datos del negocio. No valida reglas ni usa estructuras propias salvo <code>ListaEnlazada</code> para historiales.</li>
         <li><strong>servicio</strong> → la lógica (<code>Banco</code>, <code>ServicioPuntos</code>, <code>Comisiones</code>, <code>Reloj</code>). Crea y modifica el modelo.</li>
-        <li><strong>interfaz.Main</strong> → demo de consola que ejecuta las Fases 1 y 2. No es una interfaz gráfica.</li>
+        <li><strong>interfaz</strong> → la UI JavaFX. <code>Main</code> abre el login y el dashboard; las vistas consultan <code>Banco</code> y reciben DTOs.</li>
       </ul>
 
       <aside class="card howto">
         <h3>Estado del proyecto</h3>
         <ul>
-          <li>Java 21 + Maven; JavaFX declarado pero todavía sin usar.</li>
-          <li>No hay UI, ni FXML, ni tests.</li>
-          <li>El entrypoint real es <code>interfaz.Main</code> (demo de consola).</li>
+          <li>Java 21 + Maven; JavaFX en uso con vistas programáticas (sin FXML).</li>
+          <li>Hay UI completa, 8 TADs y 89 pruebas JUnit.</li>
+          <li>El entrypoint real es <code>interfaz.Main</code> (aplicación JavaFX).</li>
           <li>Estas guías son análisis estático: no ejecutan ni modifican el código.</li>
         </ul>
       </aside>

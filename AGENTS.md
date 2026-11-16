@@ -1,63 +1,82 @@
 # AGENTS.md
 
 ## Propósito
-Proyecto universitario (Java) de un monedero virtual, empezado por mi compañero.
-Quiero LEER y ENTENDER lo que hizo. **Responde siempre en español.**
+Proyecto universitario (Java) de un monedero virtual con sistema de puntos.
+Quiero LEER y ENTENDER el código. **Responde siempre en español.**
 
 ## Regla de inicio (obligatoria)
 - Al empezar **cada sesión** o antes de **cualquier cambio**, lee
   `resumenes/proyecto-final-estructuras-de-datos.md`.
-- Úsalo como contexto del proyecto, pero contrasta siempre con el código real y con
+- Úsalo como contexto, pero contrasta siempre con el código real y con
   `git status` / `git diff`: el repositorio es la fuente de verdad.
-- Toda explicación, revisión o propuesta debe basarse en ese resumen y en los cambios
-  reales del proyecto, no en suposiciones.
-- Si es necesario cambiar todos los archivos HTML/CSS de ilustraciones por un cambio nuevo,
-  hazlo después de cada `git pull` o `git push`.
+- Si un cambio de código afecta las guías de `ilustraciones/` (HTML/CSS), actualízalas
+  después de cada `git pull` o `git push`.
 
 ## Estado real del repo (verificado)
-- Java 21 + Maven (`pom.xml`). Dependencias: `javafx-controls` 21.0.5 (aún sin usar) y
-  `junit-jupiter` 5.10.2 (solo test).
-- **No hay UI todavía**: no hay `Launcher`, FXML ni `src/main/resources`.
-  El paquete `interfaz` solo contiene `Main` (demo de consola). No escribas código JavaFX
-  hasta que te lo pida.
-- **Hay pruebas** JUnit 5 en `src/test/java` (`mvn test`). No hay README ni carpeta `docs/`.
-- El entrypoint real es `interfaz.Main` (demo de consola de Fases 1 y 2).
-- `pom.xml` declara `mainClass = interfaz.Main`: `mvn javafx:run` ejecuta la demo
-  (Main no usa JavaFX). También: `mvn compile` y luego
-  `java -cp target/classes interfaz.Main`.
-  No corrijas el `pom.xml` sin pedirlo.
+- Java 21 + Maven. Dependencias: `javafx-controls` 21.0.5 y `junit-jupiter` 5.10.2.
+- **La UI JavaFX ya existe**: `interfaz.Main` extiende `Application` y es el `mainClass`
+  del `pom.xml`; `interfaz.Launcher` solo delega en `Main`. No cambies el entrypoint
+  ni el `pom.xml` sin pedirlo.
+- `mvn javafx:run` abre la app; `mvn test` corre las pruebas JUnit 5 (~89).
+  No ejecutes compilaciones ni pruebas salvo que se pida.
+- No hay `docs/` ni README; la documentación vive en `resumenes/` e `ilustraciones/`.
 
-## Estructura de paquetes (no obvia)
-Solo `Main` vive en `interfaz`; el resto son paquetes de primer nivel:
-- `estructuras/`: TADs propios (ListaEnlazada, TablaHash, Arbol BST).
-  **Sin colecciones de `java.util`** para las estructuras (solo `Iterator`/`NoSuchElementException`).
-  No las reemplaces por `ArrayList`/`HashMap`; es el núcleo del proyecto.
-- `modelo/`: dominio (Cliente, Transaccion, CuentaPuntos, Beneficio, enums…).
-- `servicio/`: lógica de negocio. `Banco` es la fachada; `ServicioPuntos` (ranking con TablaHash+Árbol),
-  `Comisiones` (tasas centralizadas), `Reloj` (tiempo simulado: `avanzarDias` para probar vencimientos),
-  `OperacionInvalidaException`.
-- Dinero con `BigDecimal`; puntos = división entera por cada 100 según tipo de transacción.
+## Cómo ejecutar
+- UI: `mvn javafx:run` (no usar `java -cp target/classes`: JavaFX exige módulos).
+- Todas las pruebas: `mvn test`.
+- Una clase: `mvn -Dtest=ServicioPuntosTest test`.
+- Un método: `mvn -Dtest=ServicioPuntosTest#calcularPuntosPorTipoYDivisionEntera test`.
+- Login de la demo: solo ID de cliente (sin contraseña). `Main` precarga
+  `ana`, `bruno`, `carla`.
+
+## Arquitectura (lo no obvio)
+- Paquetes de primer nivel: `estructuras`, `modelo`, `servicio`; solo `Main` y las
+  vistas viven en `interfaz`.
+- `estructuras/` tiene 8 TADs propios: `ListaEnlazada`, `TablaHash`, `Arbol` (BST),
+  `ArbolAVL`, `Pila`, `ColaPrioridad`, `ListaCircular`, `GrafoDirigido`.
+  **Prohibido sustituirlos por `java.util`** (solo se permite `Iterator`).
+- Ya están conectados a `servicio`: `ListaEnlazada` (historiales), `TablaHash` (clientes,
+  cuentas, transacciones), `ArbolAVL` (ranking), `Pila` (reversión), `ColaPrioridad`
+  (programadas), `ListaCircular` (notificaciones) y `GrafoDirigido` (reportes y
+  monederos). `Arbol` (BST) sigue existiendo con pruebas, pero el ranking usa AVL.
+- `servicio.Banco` es la fachada; `ServicioPuntos` usa `TablaHash` (cuentas) +
+  `ArbolAVL` (ranking); `ServicioNotificaciones`, `ServicioReportes` y
+  `ServicioIntegridad` cubren las funciones avanzadas; `Comisiones` centraliza tasas;
+  `Reloj` permite avanzar tiempo simulado (`avanzarDias`/`avanzarHoras`) para probar
+  vencimientos y programadas.
+- Dinero con `BigDecimal`; puntos = división entera por cada 100 según
+  `TipoTransaccion` (transferencia recibida y bono no otorgan puntos).
+- UI: `Main` carga en orden `base.css`, `components.css`, `login.css`, `pass-card.css`,
+  `dashboard.css` y `views.css` desde `src/main/resources/interfaz/`; si mueves estilos,
+  ajusta `Main.ESTILOS`. `DashboardView` es el shell con navegación; cada pantalla
+  implementa `Vista` (`ResumenView`, `MovimientosView`, `OperacionesView`, `PuntosView`,
+  `RankingView`, `ReversionView`, `MonederosView`, `ProgramadasView`,
+  `NotificacionesView`, `ReportesView`, `IntegridadView`). Las vistas de consulta usan
+  DTOs de `servicio.dto` y `MovimientoCell` pinta `MovimientoDto` sin consultar `Banco`.
+  `LoginView`, `PassCard`, `RangeLadder` y `Ui` son apoyo visual.
+- Las guías de `ilustraciones/` son HTML/CSS estáticos escritos a mano; sus cifras
+  (nº de pruebas/TADs) pueden estar desactualizadas: verifica antes de repetirlas.
 
 ## Modo de trabajo
 - Por defecto, NO edites, crees, borres ni muevas archivos del proyecto: explica en texto
-  lo que debería cambiarse. Sí puedes hacerlo cuando te lo pida explícitamente.
+  lo que debería cambiarse. Sí puedes hacerlo cuando se pida explícitamente.
 - Puedes crear archivos en `ilustraciones/` (scripts de Python e imágenes),
   `resumenes/` (Markdown) y `src/test/java/` (pruebas) cuando corresponda.
-- Comandos de git de lectura: `git status`, `git log`, `git diff`, `git fetch`.
-- `git commit` / `git push` solo si te lo pido; si el push se rechaza por cambios remotos,
-  avísame antes de hacer merge/rebase. No fuerces el push.
-- Ejecuta compilaciones o `mvn test` solo cuando te lo pida.
+- Git de solo lectura: `git status`, `git log`, `git diff`, `git fetch`.
+- `git commit` / `git push` solo si se piden; si el push se rechaza por cambios remotos,
+  avisa antes de merge/rebase. No fuerces el push.
 
 ## Cómo leer (ahorrar contexto)
 - Lista/busca carpetas antes de abrir archivos; abre solo lo necesario.
 - No releas archivos ya leídos en la sesión.
-- Los requerimientos están resumidos en `resumenes/proyecto-final-estructuras-de-datos.md`;
-  úsalo como punto de partida, pero verifica contra el código. No inventes requerimientos.
-- Respuestas breves; extiéndete solo si te lo pido.
+- Los requerimientos están en `resumenes/proyecto-final-estructuras-de-datos.md`;
+  verifica contra el código y no inventes requerimientos.
+- Respuestas breves; extiéndete solo si se pide.
 
-## Cuando te diga "hice pull" o "hice push"
-1. Mira qué cambió con `git log` y `git diff` (contra el estado anterior).
-2. Explica en pocas líneas: archivos cambiados, métodos agregados/modificados/borrados y con qué clases se relacionan.
+## Cuando diga "hice pull" o "hice push"
+1. Mira qué cambió con `git log` y `git diff` contra el estado anterior.
+2. Explica en pocas líneas: archivos cambiados, métodos agregados/modificados/borrados
+   y con qué clases se relacionan.
 3. Indica qué requerimiento toca cada cambio.
 
 ## Al explicar código
@@ -65,11 +84,17 @@ Solo `Main` vive en `interfaz`; el resto son paquetes de primer nivel:
 - Marca lo que no corresponda a ningún requerimiento.
 
 ## Revisión de calidad
-Avísame (archivo:línea) si ves métodos de más de ~40 líneas, código ajeno a los
+Avisa (`archivo:línea`) si ves métodos de más de ~40 líneas, código ajeno a los
 requerimientos, código repetido o comentado, o nombres poco claros. No lo corrijas.
 
 ## Advertencias
-- No leas ni muestres claves, contraseñas ni configuración privada.
+- No leas ni muestres claves, contraseñas ni configuración privada (incluido `.idea/`).
 - No inventes; si no estás seguro, dilo.
-- No asumas que el código funciona: verifica con `mvn test` cuando se te pida y di qué
+- No asumas que el código funciona: verifica con `mvn test` cuando se pida y di qué
   no pudiste verificar.
+
+
+## UI
+Lee DESIGN.md antes de cualquier cambio visual.
+Mobile-first: escribe estilos base para 320px, amplía con min-width.
+Verifica ARIA y contraste en cada componente nuevo.

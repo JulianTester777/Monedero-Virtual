@@ -19,13 +19,14 @@
         El dominio del monedero virtual: quién es el cliente, cuánto saldo y puntos tiene,
         qué operaciones realizó y cómo se representa el ranking. Una guía visual de qué hace
         cada clase, cada campo y cada método, sin entrar en la lógica de negocio
-        (esa vive en <code>servicio</code>).
+        (esa vive en <code>servicio</code>). El dominio también incluye monederos,
+        transacciones programadas, notificaciones e integridad.
       </p>
       <ul class="hero-stats">
-        <li><strong>9</strong><span>tipos del dominio</span></li>
-        <li><strong>5</strong><span>clases</span></li>
-        <li><strong>4</strong><span>enums</span></li>
-        <li><strong>53</strong><span>métodos</span></li>
+        <li><strong>17</strong><span>tipos del dominio</span></li>
+        <li><strong>11</strong><span>clases</span></li>
+        <li><strong>6</strong><span>enums</span></li>
+        <li><strong>0</strong><span>dependencias externas</span></li>
       </ul>
     </div>
   </header>
@@ -812,7 +813,7 @@
               <tr>
                 <td class="sig"><code>getDescripcion()</code><span class="vis public">public</span></td>
                 <td>Devuelve el texto del beneficio.</td>
-                <td>Se imprime en la demo y en los mensajes.</td>
+                <td>Se muestra en la UI y en los mensajes.</td>
               </tr>
             </tbody>
           </table>
@@ -958,9 +959,9 @@
         <h3>Detalles a tener en cuenta</h3>
         <ul>
           <li>Los enums no tienen setters: sus valores son fijos.</li>
-          <li>El costo y la descripción de <code>Beneficio</code> viven en un solo lugar; si cambian, cambia la demo y el servicio a la vez.</li>
+          <li>El costo y la descripción de <code>Beneficio</code> viven en un solo lugar; si cambian, cambian la UI y el servicio a la vez.</li>
           <li>La regla de puntos por tipo no está en el enum, sino en <code>ServicioPuntos</code>.</li>
-          <li>El rango no se persiste: <code>CuentaPuntos.getRango</code> lo calcula desde <code>acumulados</code>; la reversión de transacciones aún no está implementada.</li>
+          <li>El rango no se persiste: <code>CuentaPuntos.getRango</code> lo calcula desde <code>acumulados</code>; la reversión ya está implementada y usa <code>TipoMovimientoPuntos.REVERSION</code>.</li>
         </ul>
       </article>
     </section>
@@ -984,6 +985,10 @@
         <li><strong>EntradaPuntos</strong> → es el elemento que ordena <code>Arbol</code> para el ranking.</li>
         <li><strong>Beneficio</strong> → lo lee <code>ServicioPuntos.canjear</code>; el efecto se aplica en <code>CuentaPuntos</code> y <code>Banco</code>.</li>
         <li><strong>Rango</strong> → se deriva de <code>CuentaPuntos.acumulados</code>; no se almacena ni se modifica al canjear.</li>
+        <li><strong>Monedero</strong> → cada <code>Cliente</code> tiene uno principal y puede crear más; <code>Transaccion</code> guarda el monedero afectado.</li>
+        <li><strong>TransaccionProgramada</strong> → usa <code>Recurrencia</code> y <code>EstadoProgramada</code>; la procesa <code>Banco</code> con una cola de prioridad.</li>
+        <li><strong>Notificacion</strong> → usa <code>TipoNotificacion</code>; <code>ServicioNotificaciones</code> la guarda en una lista circular por cliente.</li>
+        <li><strong>ResultadoIntegridad</strong> → acumula errores de <code>ServicioIntegridad</code> sin lanzar excepciones.</li>
       </ul>
 
       <div class="grid-2">
@@ -1077,7 +1082,7 @@
         <article class="finding good">
           <h3>Lo que está bien</h3>
           <ul>
-            <li><strong>Inmutabilidad:</strong> <code>Transaccion</code> y <code>EntradaPuntos</code> tienen todos sus campos <code>final</code>.</li>
+            <li><strong>Inmutabilidad parcial:</strong> <code>EntradaPuntos</code> tiene todos sus campos <code>final</code>; <code>Transaccion</code> conserva finales sus datos base y agrega estado de reversión y pareja.</li>
             <li><strong>Contrato de comparación:</strong> <code>EntradaPuntos</code> define <code>compareTo</code>, <code>equals</code> y <code>hashCode</code> de forma coherente.</li>
             <li><strong>Signo explícito:</strong> <code>MovimientoPuntos</code> guarda puntos positivos y deduce el signo del tipo.</li>
             <li><strong>Catálogos centralizados:</strong> costos y descripciones viven en <code>Beneficio</code>.</li>
@@ -1094,7 +1099,7 @@
             <li><strong>Contador estático:</strong> <code>Transaccion.contador</code> es global, no <em>thread-safe</em> y se reinicia por JVM.</li>
             <li><strong>Sin <code>equals</code>/<code>hashCode</code>:</strong> <code>Cliente</code>, <code>Transaccion</code> y <code>MovimientoPuntos</code> usan identidad por objeto.</li>
             <li><strong>Sin validación de puntos negativos</strong> en el constructor de <code>MovimientoPuntos</code>.</li>
-            <li><strong>Reversión pendiente:</strong> no hay método para revertir una transacción ni recalcular puntos; <code>Rango</code> se actualizará solo porque se deriva de <code>acumulados</code>.</li>
+            <li><strong>Reversión implementada:</strong> <code>Banco.revertirTransaccion</code> y <code>ServicioPuntos.revertir</code> recalculan saldo, puntos y ranking; <code>Rango</code> se actualiza porque se deriva de <code>acumulados</code>.</li>
           </ul>
         </article>
       </div>

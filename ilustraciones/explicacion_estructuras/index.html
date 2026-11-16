@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Análisis visual del paquete estructuras del monedero virtual: ListaEnlazada, TablaHash y Arbol.">
+  <meta name="description" content="Análisis visual del paquete estructuras del monedero virtual: ocho TAD propios.">
   <title>Estructuras del monedero virtual</title>
   <link rel="stylesheet" href="estilos.css">
 </head>
@@ -15,14 +15,15 @@
       <p class="eyebrow">Proyecto final · Estructuras de datos · Análisis estático</p>
       <h1>Paquete <code>estructuras</code></h1>
       <p class="lead">
-        Las tres estructuras que sostienen el monedero virtual: la lista enlazada de los
-        historiales, la tabla hash de acceso por id y el árbol de búsqueda del ranking de
-        puntos. Una guía visual de qué hace cada clase y cada método.
+        Ocho TAD propios sostienen el monedero virtual. Esta página detalla las tres
+        estructuras base (lista enlazada, tabla hash y árbol BST); el árbol AVL, la pila,
+        la cola de prioridad, la lista circular y el grafo dirigido se usan en reversión,
+        programadas, notificaciones, reportes y multimonedero.
       </p>
       <ul class="hero-stats">
-        <li><strong>3</strong><span>clases propias</span></li>
-        <li><strong>37</strong><span>métodos y miembros</span></li>
-        <li><strong>3</strong><span>TAD implementados</span></li>
+        <li><strong>8</strong><span>clases propias</span></li>
+        <li><strong>8</strong><span>TAD implementados</span></li>
+        <li><strong>3</strong><span>detallados aquí</span></li>
         <li><strong>0</strong><span>librerías externas</span></li>
       </ul>
     </div>
@@ -73,7 +74,7 @@
         <article class="map-card map-arbol">
           <span class="map-symbol" aria-hidden="true">⌂</span>
           <h3>Arbol&lt;T&gt;</h3>
-          <p>BST sin balanceo que ordena por <code>compareTo</code>. Sostiene el ranking y el top n de puntos.</p>
+            <p>BST sin balanceo que ordena por <code>compareTo</code>. Se conserva con pruebas; el ranking usa <code>ArbolAVL</code>.</p>
           <p class="map-use"><strong>Usado por:</strong> ServicioPuntos.ranking con EntradaPuntos.</p>
           <div class="req-tags"><span class="tag">RA-01</span><span class="tag">RA-02 parcial</span></div>
         </article>
@@ -386,7 +387,7 @@
         <div class="req-tags">
           <span class="tag">RA-01 · puntos</span>
           <span class="tag">RA-02 · parcial</span>
-          <span class="tag">RP-04 · pendiente</span>
+          <span class="tag">RP-04 · implementado con AVL</span>
         </div>
       </div>
 
@@ -668,7 +669,7 @@
             <tr>
               <td><strong>RA-02</strong><br><span class="muted">rangos y árboles balanceados</span></td>
               <td><span class="status partial">Parcial</span></td>
-              <td>Hay ranking con <code>Arbol</code>, pero es un BST sin balanceo y no existen los rangos Bronce/Plata/Oro/Platino.</td>
+              <td>El ranking usa <code>ArbolAVL</code> y <code>ServicioPuntos.calcularRango</code> calcula Bronce/Plata/Oro/Platino.</td>
             </tr>
             <tr>
               <td><strong>RP-01</strong><br><span class="muted">registro e historial de puntos</span></td>
@@ -682,8 +683,8 @@
             </tr>
             <tr>
               <td><strong>RP-04</strong><br><span class="muted">función de rango por puntos</span></td>
-              <td><span class="status pending">Pendiente</span></td>
-              <td>No hay método que calcule el rango a partir de los puntos.</td>
+              <td><span class="status ok">Implementado</span></td>
+              <td><code>ServicioPuntos.calcularRango</code> y <code>Rango.desdePuntos</code> calculan el rango.</td>
             </tr>
           </tbody>
         </table>
@@ -715,7 +716,7 @@
         <article class="finding warn">
           <h3>Puntos de mejora</h3>
           <ul>
-            <li><strong>Arbol sin balanceo:</strong> con datos ordenados pierde O(log n). RA-02 pide árboles balanceados.</li>
+            <li><strong>Arbol sin balanceo:</strong> con datos ordenados pierde O(log n); RA-02 se cumple con <code>ArbolAVL</code> en el ranking.</li>
             <li><strong>TablaHash.iterator():</strong> copia todas las entradas en una lista temporal (O(cap + n) y memoria extra).</li>
             <li><strong>ListaEnlazada.eliminar():</strong> depende de <code>equals()</code>; con <code>null</code> puede fallar y no hay <code>remove()</code> en el iterador.</li>
             <li><strong>ListaEnlazada:</strong> no permite eliminar por índice.</li>

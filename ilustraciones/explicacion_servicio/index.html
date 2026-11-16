@@ -18,14 +18,15 @@
       <p class="lead">
         La lógica de negocio del monedero virtual: <code>Banco</code> como fachada,
         <code>ServicioPuntos</code> para el sistema de puntos y el ranking,
-        <code>Comisiones</code> para las tasas, <code>Reloj</code> para el tiempo simulado y
-        <code>OperacionInvalidaException</code> para los errores de negocio. Aquí se explica
-        cada método, uno por uno, y qué estructuras usa.
+        <code>Comisiones</code> para las tasas, <code>Reloj</code> para el tiempo simulado,
+        <code>ServicioNotificaciones</code>, <code>ServicioReportes</code> y
+        <code>ServicioIntegridad</code> para las funciones avanzadas, y
+        <code>OperacionInvalidaException</code> para los errores de negocio.
       </p>
       <ul class="hero-stats">
-        <li><strong>5</strong><span>clases</span></li>
-        <li><strong>39</strong><span>métodos</span></li>
-        <li><strong>3</strong><span>estructuras propias</span></li>
+        <li><strong>8</strong><span>clases</span></li>
+        <li><strong>8</strong><span>estructuras propias</span></li>
+        <li><strong>8</strong><span>TAD conectados</span></li>
         <li><strong>0</strong><span>dependencias externas</span></li>
       </ul>
     </div>
@@ -57,23 +58,23 @@
         El paquete <code>servicio</code> es el pegamento del proyecto: recibe el dominio de
         <code>modelo</code>, lo guarda en las estructuras de <code>estructuras</code> y aplica
         las reglas del negocio. Ninguna clase de aquí tiene interfaz gráfica ni código de
-        consola: eso vive en <code>interfaz.Main</code>.
+        consola: eso vive en el paquete <code>interfaz</code>, sobre JavaFX.
       </p>
 
       <div class="map-grid">
         <article class="map-card svc-banco">
           <span class="map-symbol" aria-hidden="true">B</span>
           <h3>Banco</h3>
-          <p>Fachada de negocio: registra clientes, mueve saldo, crea transacciones, delega los puntos y consulta rangos.</p>
-          <p class="map-use"><strong>Usa:</strong> TablaHash, ServicioPuntos, Reloj.</p>
+          <p>Fachada de negocio: registra clientes, mueve saldo, crea transacciones, delega los puntos y coordina reversión, programadas, reportes e integridad.</p>
+          <p class="map-use"><strong>Usa:</strong> TablaHash, Pila, ColaPrioridad, ServicioPuntos, Reloj.</p>
           <div class="req-tags"><span class="tag">RF-01…RF-05</span><span class="tag">RA-01</span><span class="tag">RP-03</span></div>
         </article>
 
         <article class="map-card svc-puntos">
           <span class="map-symbol" aria-hidden="true">★</span>
           <h3>ServicioPuntos</h3>
-          <p>Calcula, otorga y canjea puntos, mantiene el ranking en un árbol BST y clasifica por rangos.</p>
-          <p class="map-use"><strong>Usa:</strong> TablaHash y Arbol.</p>
+            <p>Calcula, otorga, revierte y canjea puntos; mantiene el ranking en un árbol AVL y clasifica por rangos.</p>
+            <p class="map-use"><strong>Usa:</strong> TablaHash y ArbolAVL.</p>
           <div class="req-tags"><span class="tag">RA-01</span><span class="tag">RP-01</span><span class="tag">RP-03</span></div>
         </article>
 
@@ -91,6 +92,30 @@
           <p>Tiempo simulado: hora real más un desplazamiento que se puede adelantar.</p>
           <p class="map-use"><strong>Usado por:</strong> Banco para fechas y vencimientos.</p>
           <div class="req-tags"><span class="tag">RP-03</span><span class="tag">RA-01</span></div>
+        </article>
+
+        <article class="map-card svc-puntos">
+          <span class="map-symbol" aria-hidden="true">◌</span>
+          <h3>ServicioNotificaciones</h3>
+          <p>Encola avisos por cliente en una lista circular y permite listarlos, avanzar y marcarlos como leídos.</p>
+          <p class="map-use"><strong>Usa:</strong> ListaCircular y TablaHash.</p>
+          <div class="req-tags"><span class="tag">alertas</span><span class="tag">programadas</span></div>
+        </article>
+
+        <article class="map-card svc-comisiones">
+          <span class="map-symbol" aria-hidden="true">↗</span>
+          <h3>ServicioReportes</h3>
+          <p>Construye grafos dirigidos de clientes, categorías y monederos para patrones, ciclos y caminos.</p>
+          <p class="map-use"><strong>Usa:</strong> GrafoDirigido y TablaHash.</p>
+          <div class="req-tags"><span class="tag">RA-04</span><span class="tag">grafos</span></div>
+        </article>
+
+        <article class="map-card svc-reloj">
+          <span class="map-symbol" aria-hidden="true">✓</span>
+          <h3>ServicioIntegridad</h3>
+          <p>Reconstruye saldos y puntos, detecta duplicados, parejas de transferencia y reversiones inconsistentes.</p>
+          <p class="map-use"><strong>Usa:</strong> ListaEnlazada y TablaHash.</p>
+          <div class="req-tags"><span class="tag">integridad</span><span class="tag">recursivo</span></div>
         </article>
 
         <article class="map-card svc-error">
@@ -112,9 +137,12 @@
 
       <ul class="relations">
         <li><strong>Banco</strong> guarda los clientes en <code>TablaHash&lt;String, Cliente&gt;</code> y usa un <code>ServicioPuntos</code> y un <code>Reloj</code> propios.</li>
-        <li><strong>ServicioPuntos</strong> guarda las cuentas en <code>TablaHash&lt;String, CuentaPuntos&gt;</code> y el ranking en <code>Arbol&lt;EntradaPuntos&gt;</code>.</li>
+        <li><strong>ServicioPuntos</strong> guarda las cuentas en <code>TablaHash&lt;String, CuentaPuntos&gt;</code> y el ranking en <code>ArbolAVL&lt;EntradaPuntos&gt;</code>.</li>
         <li><strong>Comisiones</strong> es una utilidad estática: no guarda estado y la llama <code>Banco</code>.</li>
         <li><strong>Reloj</strong> envuelve la hora del sistema con un <code>Duration</code> de desplazamiento.</li>
+        <li><strong>ServicioNotificaciones</strong> mantiene una lista circular por cliente; <code>siguiente</code> devuelve el aviso actual y avanza el cursor.</li>
+        <li><strong>ServicioReportes</strong> registra aristas cliente→categoría y cliente→cliente; también monedero→monedero.</li>
+        <li><strong>ServicioIntegridad</strong> no lanza excepciones: acumula errores en <code>ResultadoIntegridad</code>.</li>
         <li><strong>OperacionInvalidaException</strong> es <em>unchecked</em> (<code>RuntimeException</code>): no obliga a <code>try/catch</code>.</li>
         <li><strong>BigDecimal</strong> es inmutable: cada operación devuelve un objeto nuevo que hay que asignar.</li>
       </ul>
@@ -139,8 +167,8 @@
           <p>
             Punto de entrada de la lógica. Valida las operaciones, mueve el saldo del
             <code>Cliente</code>, crea las <code>Transaccion</code> y delega en
-            <code>ServicioPuntos</code>, <code>Comisiones</code> y <code>Reloj</code>. La demo
-            de consola (<code>Main</code>) solo habla con esta clase.
+            <code>ServicioPuntos</code>, <code>Comisiones</code> y <code>Reloj</code>. La UI
+            JavaFX habla con esta clase a través de sus vistas y de los DTO de consulta.
           </p>
         </div>
         <div class="req-tags">
@@ -160,7 +188,7 @@
           </p>
           <h4>Se usa en</h4>
           <ul>
-            <li><code>interfaz.Main</code>: toda la demo pasa por <code>Banco</code>.</li>
+            <li><code>interfaz.DashboardView</code> y sus vistas: las operaciones pasan por <code>Banco</code>.</li>
             <li><code>Banco.depositar/retirar/transferir</code>: crean transacciones.</li>
             <li><code>Banco.canjearBeneficio</code>: aplica el bono de saldo.</li>
           </ul>
@@ -278,7 +306,7 @@
               <tr>
                 <td class="sig"><code>getReloj()</code><span class="vis public">public</span></td>
                 <td>Devuelve el <code>Reloj</code> que usa el banco.</td>
-                <td>Permite avanzar días desde la demo; expone el objeto mutable.</td>
+                <td>Permite avanzar días en pruebas o simulación; expone el objeto mutable.</td>
               </tr>
               <tr>
                 <td class="sig"><code>validarMonto(BigDecimal monto)</code><span class="vis private">private</span></td>
@@ -316,7 +344,7 @@
           <p>
             Todo lo relacionado con los puntos: cuántos genera una transacción, cómo se suman,
             cómo se canjean, cómo se mantiene el ranking y cómo se clasifica a cada cliente en
-            un rango. Usa una tabla hash para las cuentas y un árbol BST para el orden por puntos.
+            un rango. Usa una tabla hash para las cuentas y un árbol AVL para el orden por puntos.
           </p>
         </div>
         <div class="req-tags">
@@ -346,11 +374,11 @@
           <h3>Estructuras internas</h3>
           <ul class="fields">
             <li><strong>cuentas</strong> TablaHash&lt;String, CuentaPuntos&gt;</li>
-            <li><strong>ranking</strong> Arbol&lt;EntradaPuntos&gt;</li>
+            <li><strong>ranking</strong> ArbolAVL&lt;EntradaPuntos&gt;</li>
           </ul>
           <p>
             La tabla da acceso promedio O(1) por id. El árbol mantiene el orden por puntos
-            acumulados; <code>EntradaPuntos</code> desempata por id. El BST no está balanceado.
+            acumulados; <code>EntradaPuntos</code> desempata por id. El AVL se rebalancea en cada inserción y eliminación.
           </p>
           <div class="formula">puntos = (monto / 100) entero × factor del tipo</div>
           <p>
@@ -417,7 +445,7 @@
               <tr>
                 <td class="sig"><code>top(int n)</code><span class="vis public">public</span></td>
                 <td>Devuelve los <code>n</code> clientes con más puntos, de mayor a menor.</td>
-                <td>Delega en <code>Arbol.mayores(n)</code>.</td>
+                <td>Delega en <code>ArbolAVL.mayores(n)</code>.</td>
               </tr>
               <tr>
                 <td class="sig"><code>rankingCompleto()</code><span class="vis public">public</span></td>
@@ -425,9 +453,9 @@
                 <td>Usa <code>mayores(tamano())</code>.</td>
               </tr>
               <tr>
-                <td class="sig"><code>alturaArbol()</code><span class="vis public">public</span></td>
-                <td>Devuelve la altura actual del árbol de ranking.</td>
-                <td>Útil para ver si el BST degeneró.</td>
+        <td class="sig"><code>alturaArbol()</code><span class="vis public">public</span></td>
+        <td>Altura actual del árbol de ranking.</td>
+        <td>Útil para comprobar que el AVL mantiene O(log n).</td>
               </tr>
               <tr>
                 <td class="sig"><code>actualizarRanking(String id, int anterior, int nuevo)</code><span class="vis private">private</span></td>
@@ -448,7 +476,7 @@
           <li><code>historial</code> y <code>buscarMovimientoPorTransaccion</code> solo leen la lista interna de movimientos.</li>
           <li>Las transferencias recibidas y los bonos no generan puntos.</li>
           <li>El árbol guarda <code>EntradaPuntos</code>, no <code>Cliente</code>: la entrada es inmutable y se reemplaza al cambiar los puntos.</li>
-          <li>El BST no se balancea: si los puntos crecen en orden, el ranking puede degenerar en lista.</li>
+          <li>El ranking usa AVL: las inserciones y eliminaciones se rebalancean para evitar una lista degenerada.</li>
           <li><code>calcularPuntos</code> no valida montos nulos ni negativos; <code>intValue()</code> puede desbordar con montos enormes.</li>
         </ul>
       </article>
@@ -582,8 +610,8 @@
           <h3>Rol y uso</h3>
           <p>
             <code>Banco</code> lo usa para fechar cada transacción y para saber si un retiro
-            tiene el beneficio de “sin cargos” activo. La demo puede llamar a
-            <code>banco.getReloj().avanzarDias(31)</code> y probar el vencimiento.
+            tiene el beneficio de “sin cargos” activo. Las pruebas pueden llamar a
+            <code>banco.getReloj().avanzarDias(31)</code> y comprobar el vencimiento.
           </p>
           <h4>Se usa en</h4>
           <ul>
@@ -689,7 +717,7 @@
           <h3>Por qué una excepción propia</h3>
           <ul>
             <li>Distingue errores de negocio de fallos técnicos.</li>
-            <li>Permite capturarla en la demo y mostrar el mensaje.</li>
+            <li>Permite capturarla en la UI y mostrar el mensaje.</li>
             <li>Al ser <em>unchecked</em>, no ensucia las firmas con <code>throws</code>.</li>
           </ul>
           <div class="callout">
@@ -722,7 +750,7 @@
         <h3>Detalles a tener en cuenta</h3>
         <ul>
           <li>No tiene código propio más allá del constructor: toda la funcionalidad viene de <code>RuntimeException</code>.</li>
-          <li>Los mensajes son los que ve el usuario en la demo; conviene mantenerlos claros.</li>
+          <li>Los mensajes son los que ve el usuario en la UI; conviene mantenerlos claros.</li>
         </ul>
       </article>
     </section>
@@ -1002,7 +1030,7 @@
             <tr>
               <td><strong>RA-01</strong><br><span class="muted">sistema de puntos y rangos</span></td>
               <td><span class="status ok">Implementado</span></td>
-              <td><code>ServicioPuntos</code> con TablaHash + Arbol; <code>consultarRango</code> clasifica al cliente.</td>
+              <td><code>ServicioPuntos</code> con TablaHash + ArbolAVL; <code>consultarRango</code> clasifica al cliente.</td>
             </tr>
             <tr>
               <td><strong>RP-01</strong><br><span class="muted">historial de puntos</span></td>
