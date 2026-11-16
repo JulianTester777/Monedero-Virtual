@@ -37,6 +37,7 @@ public class CuentaPuntos {
     // Publicos porque el servicio vive en otro paquete.
     public void sumar(int puntos) { acumulados += puntos; disponibles += puntos; }
     public void gastar(int puntos) { disponibles -= puntos; }
+    public void revertir(int puntos) { acumulados -= puntos; disponibles -= puntos; }
     public void activarDescuentoTransferencia() { descuentoTransferencia = true; }
     public void activarRetiroGratisHasta(LocalDateTime fecha) { sinCargosRetiroHasta = fecha; }
 }

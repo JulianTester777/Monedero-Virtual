@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/** Registro inmutable de una operacion realizada sobre una cuenta. */
+/** Registro de una operacion realizada sobre una cuenta. */
 public class Transaccion {
 
     private static int contador = 0;
@@ -17,6 +17,10 @@ public class Transaccion {
     private final LocalDateTime fecha;
     private final String clienteId;     // dueno del registro
     private final String contraparteId; // otro cliente (solo transferencias), o null
+    private boolean revertida;
+    private int parId;                  // id de la transaccion contraria en una transferencia
+    private String monederoId;          // monedero afectado; null representa el principal
+    private String monederoDestinoId;   // monedero destino en transferencias entre monederos
 
     public Transaccion(TipoTransaccion tipo, BigDecimal monto, BigDecimal comision,
                        LocalDateTime fecha, String clienteId, String contraparteId) {
@@ -36,11 +40,22 @@ public class Transaccion {
     public LocalDateTime getFecha() { return fecha; }
     public String getClienteId() { return clienteId; }
     public String getContraparteId() { return contraparteId; }
+    public boolean estaRevertida() { return revertida; }
+    public int getParId() { return parId; }
+    public String getMonederoId() { return monederoId; }
+    public String getMonederoDestinoId() { return monederoDestinoId; }
+
+    public void marcarRevertida() { revertida = true; }
+    public void setParId(int parId) { this.parId = parId; }
+    public void setMonederoId(String monederoId) { this.monederoId = monederoId; }
+    public void setMonederoDestinoId(String monederoDestinoId) { this.monederoDestinoId = monederoDestinoId; }
 
     @Override
     public String toString() {
         String extra = contraparteId != null ? " (" + contraparteId + ")" : "";
         String com = comision.signum() > 0 ? " | comision " + comision.toPlainString() : "";
-        return String.format("#%d [%s] %s %s%s%s", id, fecha.format(FORMATO), tipo, monto.toPlainString(), extra, com);
+        String estado = revertida ? " | REVERTIDA" : "";
+        return String.format("#%d [%s] %s %s%s%s%s", id, fecha.format(FORMATO), tipo,
+                monto.toPlainString(), extra, com, estado);
     }
 }
