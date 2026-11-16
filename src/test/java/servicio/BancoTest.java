@@ -1,11 +1,14 @@
 package servicio;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import modelo.Beneficio;
+import modelo.MovimientoPuntos;
 import modelo.TipoTransaccion;
 import modelo.Transaccion;
 import org.junit.jupiter.api.Test;
@@ -152,5 +155,41 @@ class BancoTest {
         assertEquals(2, ranking.tamano());
         assertEquals("C2", ranking.obtener(0).getClienteId());
         assertEquals("C1", ranking.obtener(1).getClienteId());
+    }
+
+    @Test
+    void consultarHistorialPuntosYBuscarMovimiento() {
+        Banco banco = bancoConClientes();
+        Transaccion t = banco.depositar("C1", new BigDecimal("250"));
+
+        assertEquals(1, banco.consultarHistorialPuntos("C1").tamano());
+        MovimientoPuntos m = banco.buscarMovimientoPuntos("C1", t.getId());
+        assertNotNull(m);
+        assertEquals(t.getId(), m.getTransaccionId());
+        assertEquals(2, m.getPuntos());
+        assertNull(banco.buscarMovimientoPuntos("C1", 999999));
+    }
+
+    @Test
+    void historialPuntosYBusquedaLanzanSiClienteNoExiste() {
+        Banco banco = new Banco();
+
+        assertThrows(OperacionInvalidaException.class, () -> banco.consultarHistorialPuntos("X"));
+        assertThrows(OperacionInvalidaException.class, () -> banco.buscarMovimientoPuntos("X", 1));
+    }
+
+    @Test
+    void rankingCompletoIncluyeATodosLosClientes() {
+        Banco banco = bancoConClientes();
+        banco.registrarCliente("C3", "Mia");
+        banco.depositar("C1", new BigDecimal("1000"));
+        banco.depositar("C3", new BigDecimal("500"));
+
+        var ranking = banco.rankingCompleto();
+
+        assertEquals(3, ranking.tamano());
+        assertEquals("C1", ranking.obtener(0).getClienteId());
+        assertEquals("C3", ranking.obtener(1).getClienteId());
+        assertEquals("C2", ranking.obtener(2).getClienteId());
     }
 }

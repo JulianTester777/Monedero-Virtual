@@ -2,6 +2,8 @@ package servicio;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -11,6 +13,7 @@ import java.time.LocalDateTime;
 import modelo.Beneficio;
 import modelo.CuentaPuntos;
 import modelo.EntradaPuntos;
+import modelo.MovimientoPuntos;
 import modelo.TipoTransaccion;
 import modelo.Transaccion;
 import org.junit.jupiter.api.Test;
@@ -139,5 +142,38 @@ class ServicioPuntosTest {
         CuentaPuntos cuenta = servicio.consultar("C1");
         assertEquals(1000, cuenta.getAcumulados());
         assertEquals(0, cuenta.getDisponibles());
+    }
+
+    @Test
+    void historialVacioYBusquedaDevuelveNulo() {
+        ServicioPuntos servicio = new ServicioPuntos();
+        servicio.registrarCliente("C1");
+
+        assertEquals(0, servicio.historial("C1").tamano());
+        assertNull(servicio.buscarMovimientoPorTransaccion("C1", 999));
+    }
+
+    @Test
+    void historialRegistraGanadosYBusquedaPorTransaccion() {
+        ServicioPuntos servicio = new ServicioPuntos();
+        servicio.registrarCliente("C1");
+        Transaccion t = transaccion(TipoTransaccion.DEPOSITO, "250", "C1");
+        servicio.otorgar(t);
+
+        ListaEnlazada<MovimientoPuntos> historial = servicio.historial("C1");
+        assertEquals(1, historial.tamano());
+        MovimientoPuntos m = servicio.buscarMovimientoPorTransaccion("C1", t.getId());
+        assertNotNull(m);
+        assertEquals(t.getId(), m.getTransaccionId());
+        assertEquals(2, m.getPuntos());
+        assertEquals(historial.obtener(0), m);
+    }
+
+    @Test
+    void historialYBusquedaLanzanSiClienteNoExiste() {
+        ServicioPuntos servicio = new ServicioPuntos();
+
+        assertThrows(OperacionInvalidaException.class, () -> servicio.historial("X"));
+        assertThrows(OperacionInvalidaException.class, () -> servicio.buscarMovimientoPorTransaccion("X", 1));
     }
 }
