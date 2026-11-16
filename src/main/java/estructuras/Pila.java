@@ -51,4 +51,14 @@ public class Pila<T> {
     public int tamano() {
         return tamano;
     }
+
+    public ListaEnlazada<T> elementos() {
+        ListaEnlazada<T> copia = new ListaEnlazada<>();
+        Nodo<T> actual = cima;
+        while (actual != null) {
+            copia.agregar(actual.dato);
+            actual = actual.siguiente;
+        }
+        return copia;
+    }
 }

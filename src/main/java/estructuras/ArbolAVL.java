@@ -88,11 +88,23 @@ public class ArbolAVL<T extends Comparable<T>> {
     }
 
     public NodoBalanceado<T> rotarIzquierda(NodoBalanceado<T> nodo) {
-        return null;
+        if (nodo == null || nodo.derecho == null) return nodo;
+        NodoBalanceado<T> nuevaRaiz = nodo.derecho;
+        nodo.derecho = nuevaRaiz.izquierdo;
+        nuevaRaiz.izquierdo = nodo;
+        actualizarAltura(nodo);
+        actualizarAltura(nuevaRaiz);
+        return nuevaRaiz;
     }
 
     public NodoBalanceado<T> rotarDerecha(NodoBalanceado<T> nodo) {
-        return null;
+        if (nodo == null || nodo.izquierdo == null) return nodo;
+        NodoBalanceado<T> nuevaRaiz = nodo.izquierdo;
+        nodo.izquierdo = nuevaRaiz.derecho;
+        nuevaRaiz.derecho = nodo;
+        actualizarAltura(nodo);
+        actualizarAltura(nuevaRaiz);
+        return nuevaRaiz;
     }
 
     private Nodo<T> rotarIzquierda(Nodo<T> x) {
@@ -127,7 +139,21 @@ public class ArbolAVL<T extends Comparable<T>> {
     }
 
     public NodoBalanceado<T> balancear(NodoBalanceado<T> nodo) {
-        return null;
+        if (nodo == null) return null;
+        int fe = altura(nodo.izquierdo) - altura(nodo.derecho);
+        if (fe > 1) {
+            if (altura(nodo.izquierdo.izquierdo) < altura(nodo.izquierdo.derecho)) {
+                nodo.izquierdo = rotarIzquierda(nodo.izquierdo);
+            }
+            return rotarDerecha(nodo);
+        }
+        if (fe < -1) {
+            if (altura(nodo.derecho.derecho) < altura(nodo.derecho.izquierdo)) {
+                nodo.derecho = rotarDerecha(nodo.derecho);
+            }
+            return rotarIzquierda(nodo);
+        }
+        return nodo;
     }
 
     private Nodo<T> balancear(Nodo<T> nodo) {
@@ -225,7 +251,18 @@ public class ArbolAVL<T extends Comparable<T>> {
         return tamano == 0;
     }
 
+    private int altura(NodoBalanceado<T> nodo) {
+        return nodo == null ? 0 : nodo.altura;
+    }
+
+    private void actualizarAltura(NodoBalanceado<T> nodo) {
+        if (nodo != null) nodo.altura = 1 + Math.max(altura(nodo.izquierdo), altura(nodo.derecho));
+    }
+
     public static class NodoBalanceado<T> {
         public T dato;
+        public NodoBalanceado<T> izquierdo;
+        public NodoBalanceado<T> derecho;
+        public int altura = 1;
     }
 }
