@@ -1,6 +1,6 @@
 package servicio;
 
-import estructuras.Arbol;
+import estructuras.ArbolAVL;
 import estructuras.ListaEnlazada;
 import estructuras.TablaHash;
 import modelo.*;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 /**
  * Gestiona los puntos de los clientes con dos estructuras:
  *  - TablaHash (id -> CuentaPuntos): acceso O(1) a los datos de puntos de un cliente.
- *  - ArbolBST de EntradaPuntos: clientes ordenados por puntos acumulados (ranking).
+ *  - ArbolAVL de EntradaPuntos: clientes ordenados por puntos acumulados (ranking).
  */
 public class ServicioPuntos {
 
@@ -18,7 +18,7 @@ public class ServicioPuntos {
     private static final int DIAS_SIN_CARGOS = 30;
 
     private final TablaHash<String, CuentaPuntos> cuentas = new TablaHash<>();
-    private final Arbol<EntradaPuntos> ranking = new Arbol<>();
+    private final ArbolAVL<EntradaPuntos> ranking = new ArbolAVL<>();
 
     public void registrarCliente(String id) {
         cuentas.poner(id, new CuentaPuntos(id));
@@ -61,7 +61,7 @@ public class ServicioPuntos {
             case DEPOSITO -> bloques;                  // 1 punto por cada 100
             case RETIRO -> bloques * 2;                // 2 puntos por cada 100
             case TRANSFERENCIA_ENVIADA -> bloques * 3; // 3 puntos por cada 100
-            default -> 0;                              // recibir una transferencia o un bono no da puntos
+            default -> 0;                              // recibir, mover entre monederos o un bono no da puntos
         };
     }
 
@@ -75,6 +75,27 @@ public class ServicioPuntos {
         cuenta.getHistorial().agregar(new MovimientoPuntos(
                 TipoMovimientoPuntos.GANADOS, puntos, t.getId(),
                 t.getTipo() + " de " + t.getMonto().toPlainString(), t.getFecha()));
+        actualizarRanking(cuenta.getClienteId(), anterior, cuenta.getAcumulados());
+        return puntos;
+    }
+
+    /** Descuenta los puntos generados por una transaccion revertida. */
+    public int revertir(Transaccion t) {
+        return revertir(t, LocalDateTime.now());
+    }
+
+    /** Descuenta los puntos de una transaccion y registra el movimiento de reversion. */
+    public int revertir(Transaccion t, LocalDateTime fecha) {
+        int puntos = calcularPuntos(t.getTipo(), t.getMonto());
+        if (puntos == 0) return 0;
+        CuentaPuntos cuenta = consultar(t.getClienteId());
+        if (cuenta.getDisponibles() < puntos)
+            throw new OperacionInvalidaException("No se puede revertir: el cliente ya gasto los puntos generados.");
+        int anterior = cuenta.getAcumulados();
+        cuenta.revertir(puntos);
+        cuenta.getHistorial().agregar(new MovimientoPuntos(
+                TipoMovimientoPuntos.REVERSION, puntos, t.getId(),
+                "Reversion de " + t.getTipo() + " de " + t.getMonto().toPlainString(), fecha));
         actualizarRanking(cuenta.getClienteId(), anterior, cuenta.getAcumulados());
         return puntos;
     }
