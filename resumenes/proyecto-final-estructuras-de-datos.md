@@ -84,3 +84,48 @@ El sistema debe permitir la gestión de cuentas virtuales de los clientes, donde
 ## Informe Final
 
 Incluye un análisis técnico detallado de cómo se implementaron las estructuras de datos y los algoritmos optimizados, además de ejemplos prácticos del sistema de puntos y su impacto en el uso del monedero virtual.
+
+---
+
+## Extra implementado: persistencia sin base de datos + login con contraseña
+
+Esto **no es un requerimiento del enunciado**: es un agregado aceptado por el usuario. No sustituye ningún TAD propio y no añade dependencias (I/O de archivos y `MessageDigest` son Java estándar).
+
+### Paquete `persistencia` (nuevo, primer nivel)
+
+- **`RegistroOperaciones`** — Log de operaciones en `monedero.log` (texto plano, una línea por operación, campos separados por `;`) + **replay**: `repetir(banco)` lee el archivo, lo trunca y vuelve a ejecutar cada línea con los métodos públicos de `Banco`, de modo que el estado derivado (puntos, ranking AVL, grafo de reportes, historiales y avisos) se reconstruye solo. El propio replay re-escribe las líneas (archivo auto-reparable).
+- **`Credenciales`** — Contraseñas como hash SHA-256 con sal aleatoria por usuario (`MessageDigest.isEqual` para comparar en tiempo constante). Nunca se guarda texto plano.
+
+### Formato del log
+
+`CREAR;id;nombre;sal:hash` · `DEPOSITO;id;monedero;monto;fecha` · `RETIRO;...` · `TRANSFERENCIA;origen;monO;destino;monD;monto;fecha` · `MOVIMIENTO;id;monO;monD;monto;fecha` · `MONEDERO;id;idM;nombre;tipo` · `CANJE;id;beneficio;fecha` · `PROGRAMAR;tipo;id;destino;monto;fecha;rec;ahora` · `CANCELAR_PROGRAMADA;id` · `EJECUTADA;id` · `FALLIDA;id;fechaAviso;mensaje` · `REPROGRAMAR;id;fecha` · `REVERSION;idCliente;idT;fecha` · `LEIDA;idAviso` · `UMBRAL;monto`.
+
+### Cambios en `servicio`
+
+- `Banco` tiene dos constructores: `Banco()` sin persistencia (pruebas) y `Banco(RegistroOperaciones)`. Cada método que muta estado escribe una línea vía el helper privado `persistir`; las operaciones que fallan no dejan línea.
+- `registrarCliente(id, nombre, password)`, `autenticar(id, password)` y tres restauradores de replay: `restaurarCredencial`, `restaurarFallaProgramada`, `reprogramarProgramada` (no re-inserta en la `ColaPrioridad`; reordena el montículo vaciándola y re-insertando), `marcarProgramadaEjecutada`.
+- `Reloj.establecer(LocalDateTime)` permite poner el reloj simulado en la fecha histórica de cada línea para conservar fechas y comisiones.
+
+### Arranque e interfaz
+
+- `Main.crearBanco()`: si `monedero.log` existe → replay; si no → carga demo (ana/bruno/carla, contraseña `demo`). El archivo de datos está en `.gitignore`.
+- `LoginView` con dos momentos: **Acceder** (ID + contraseña) y **Crear cuenta** (ID + nombre + contraseña); las chips demo rellenan ID y contraseña `demo`.
+
+### Pruebas
+
+- `persistencia.RegistroOperacionesTest` (7 casos, `@TempDir`): replay de saldos/historiales/puntos, contraseña sin texto plano y re-alineación de ids (contadores estáticos de `modelo` reiniciados por reflexión para simular una JVM nueva), reversiones, programada ejecutada no se duplica / cancelada no se ejecuta, umbral + aviso leído, operaciones fallidas no registradas.
+
+### Limitaciones conocidas
+
+- El replay asume un `Banco` recién creado (en la app real es lo primero que ocurre al arrancar); los ids de transacciones/programadas/avisos provienen de contadores estáticos y se alinean solo si el orden se conserva.
+- El cursor circular de `siguiente()` no se persiste: los avisos arrancan de nuevo al abrir la app.
+- **Fallo preexistente** (sin relación con este módulo): `estructuras.ListaCircular.eliminar` no desengancha el nodo cuando el cursor nunca avanzó (`previoActual == actual`, línea 67) — lo detecta `ListaCircularTest.eliminarActualAvanzaAlSiguiente:44`.
+
+## Organización de carpetas (refactor de estructura, sin cambios de comportamiento)
+
+- `interfaz/` queda con el arranque y el soporte visual: `Launcher`, `Main`, `Ui`, `PassCard`, `RangeLadder`, `LoginView`, `DashboardView`.
+- **`interfaz/vistas/`** (nuevo): la interfaz `Vista`, `MovimientoCell` y las 11 pantallas de contenido (Resumen, Movimientos, Operaciones, Puntos, Ranking, Reversión, Monederos, Programadas, Notificaciones, Reportes, Integridad). Clases y constructores ahora `public` (cruzan de paquete); `DashboardView` las importa con `interfaz.vistas.*`.
+- **`modelo/tipo/`** (nuevo): los 8 enums (`Beneficio`, `EstadoProgramada`, `Rango`, `Recurrencia`, `TipoMonedero`, `TipoMovimientoPuntos`, `TipoNotificacion`, `TipoTransaccion`). `modelo/` queda con las 9 entidades. `Banco` y `ServicioPuntos` importan `modelo.tipo.*`; el resto, imports específicos.
+- **`src/main/resources/interfaz/estilos/`** (nuevo): los 6 CSS. `Main.ESTILOS` carga desde `/interfaz/estilos/`; `pass-card.css` ajustó la ruta de su imagen de fondo a `../images/`.
+- `estructuras/`, `servicio/`, `persistencia/` y `servicio/dto/` no cambian. Verificado: `mvn clean compile` OK y `mvn test` 95/96 (el único fallo es el preexistente de `ListaCircularTest`).
+

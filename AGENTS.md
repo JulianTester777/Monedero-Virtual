@@ -13,11 +13,14 @@ Quiero LEER y ENTENDER el código. **Responde siempre en español.**
   después de cada `git pull` o `git push`.
 
 ## Estado real del repo (verificado)
-- Java 21 + Maven. Dependencias: `javafx-controls` 21.0.5 y `junit-jupiter` 5.10.2.
+- Java 21 + Maven. Dependencias: `javafx-controls` 21.0.5, `junit-jupiter` 5.10.2 e
+  Ikonli 12.4.0 (`ikonli-javafx` + `ikonli-feather-pack`, iconos Feather).
 - **La UI JavaFX ya existe**: `interfaz.Main` extiende `Application` y es el `mainClass`
   del `pom.xml`; `interfaz.Launcher` solo delega en `Main`. No cambies el entrypoint
   ni el `pom.xml` sin pedirlo.
-- `mvn javafx:run` abre la app; `mvn test` corre las pruebas JUnit 5 (~89).
+- `mvn javafx:run` abre la app; `mvn test` corre las pruebas JUnit 5 (~96; hoy falla 1
+  preexistente: `ListaCircularTest.eliminarActualAvanzaAlSiguiente`, bug de
+  `ListaCircular.eliminar` cuando el cursor nunca avanzó).
   No ejecutes compilaciones ni pruebas salvo que se pida.
 - No hay `docs/` ni README; la documentación vive en `resumenes/` e `ilustraciones/`.
 
@@ -26,12 +29,18 @@ Quiero LEER y ENTENDER el código. **Responde siempre en español.**
 - Todas las pruebas: `mvn test`.
 - Una clase: `mvn -Dtest=ServicioPuntosTest test`.
 - Un método: `mvn -Dtest=ServicioPuntosTest#calcularPuntosPorTipoYDivisionEntera test`.
-- Login de la demo: solo ID de cliente (sin contraseña). `Main` precarga
-  `ana`, `bruno`, `carla`.
+- Login con **ID + contraseña** (dos momentos en `LoginView`: "Acceder" y "Crear
+  cuenta"). Las cuentas demo (`ana`, `bruno`, `carla`) usan la contraseña `demo`;
+  cualquier usuario nuevo se crea desde la vista y aparece como chip en el login.
+- **Persistencia sin base de datos** (extra aceptado, no es requerimiento):
+  `Main.crearBanco()` carga el registro `monedero.log` (en la raíz del proyecto,
+  ignorado por git) si existe y lo reproduce; si no, precarga la demo. Las
+  contraseñas se guardan como hash SHA-256 con sal en el propio log.
 
 ## Arquitectura (lo no obvio)
-- Paquetes de primer nivel: `estructuras`, `modelo`, `servicio`; solo `Main` y las
-  vistas viven en `interfaz`.
+- Paquetes de primer nivel: `estructuras`, `modelo` (+ `modelo.tipo` con los 8 enums),
+  `servicio` (+ `servicio.dto` con los DTOs), `persistencia` (extra, sin base de datos)
+  e `interfaz` (con `interfaz.vistas` para las pantallas).
 - `estructuras/` tiene 8 TADs propios: `ListaEnlazada`, `TablaHash`, `Arbol` (BST),
   `ArbolAVL`, `Pila`, `ColaPrioridad`, `ListaCircular`, `GrafoDirigido`.
   **Prohibido sustituirlos por `java.util`** (solo se permite `Iterator`).
@@ -45,15 +54,23 @@ Quiero LEER y ENTENDER el código. **Responde siempre en español.**
   `Reloj` permite avanzar tiempo simulado (`avanzarDias`/`avanzarHoras`) para probar
   vencimientos y programadas.
 - Dinero con `BigDecimal`; puntos = división entera por cada 100 según
-  `TipoTransaccion` (transferencia recibida y bono no otorgan puntos).
+  `TipoTransaccion` (enum en `modelo.tipo`; transferencia recibida y bono no otorgan
+  puntos).
 - UI: `Main` carga en orden `base.css`, `components.css`, `login.css`, `pass-card.css`,
-  `dashboard.css` y `views.css` desde `src/main/resources/interfaz/`; si mueves estilos,
-  ajusta `Main.ESTILOS`. `DashboardView` es el shell con navegación; cada pantalla
-  implementa `Vista` (`ResumenView`, `MovimientosView`, `OperacionesView`, `PuntosView`,
-  `RankingView`, `ReversionView`, `MonederosView`, `ProgramadasView`,
-  `NotificacionesView`, `ReportesView`, `IntegridadView`). Las vistas de consulta usan
-  DTOs de `servicio.dto` y `MovimientoCell` pinta `MovimientoDto` sin consultar `Banco`.
-  `LoginView`, `PassCard`, `RangeLadder` y `Ui` son apoyo visual.
+  `dashboard.css` y `views.css` desde `src/main/resources/interfaz/estilos/`; si mueves
+  estilos, ajusta `Main.ESTILOS`. `DashboardView` (en `interfaz`) es el shell con
+  navegación; cada pantalla implementa `Vista` y vive en `interfaz.vistas`
+  (`ResumenView`, `MovimientosView`, `OperacionesView`, `PuntosView`, `RankingView`,
+  `ReversionView`, `MonederosView`, `ProgramadasView`, `NotificacionesView`,
+  `ReportesView`, `IntegridadView`). Las vistas de consulta usan DTOs de
+  `servicio.dto` y `MovimientoCell` pinta `MovimientoDto` sin consultar `Banco`.
+  `LoginView`, `PassCard`, `RangeLadder` y `Ui` (apoyo visual) viven en `interfaz`.
+- **Persistencia (`persistencia/`, extra sin BD)**: `RegistroOperaciones` guarda cada
+  operación como una línea de `monedero.log` y al arrancar la reproduce con los
+  métodos públicos de `Banco` (los hooks escribieron las líneas). `Credenciales`
+  maneja el hash de contraseñas. Los ids de transacciones/programadas/avisos vienen
+  de contadores estáticos en `modelo`; el replay asume un `Banco` recién creado
+  (en pruebas se reinician por reflexión).
 - Las guías de `ilustraciones/` son HTML/CSS estáticos escritos a mano; sus cifras
   (nº de pruebas/TADs) pueden estar desactualizadas: verifica antes de repetirlas.
 
