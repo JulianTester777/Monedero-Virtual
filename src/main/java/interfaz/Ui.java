@@ -1,6 +1,8 @@
 package interfaz;
 
 import javafx.scene.control.Label;
+import org.kordamp.ikonli.Ikon;
+import org.kordamp.ikonli.javafx.FontIcon;
 import modelo.Recurrencia;
 
 import java.math.BigDecimal;
@@ -67,6 +69,22 @@ final class Ui {
         etiqueta.setAccessibleText("");
         etiqueta.setVisible(false);
         etiqueta.setManaged(false);
+    }
+
+    /** Glifo Feather (Ikonli) listo para usar como grafico de boton o etiqueta. */
+    static FontIcon icono(Ikon ikon, int tamano) {
+        FontIcon glifo = new FontIcon(ikon);
+        glifo.setIconSize(tamano);
+        return glifo;
+    }
+
+    /** Titulo de seccion con glifo pequeno a la izquierda. */
+    static Label seccion(String texto, Ikon ikon) {
+        Label titulo = new Label(texto);
+        titulo.getStyleClass().add("section-title");
+        titulo.setGraphic(icono(ikon, 18));
+        titulo.setGraphicTextGap(10);
+        return titulo;
     }
 
     static BigDecimal parseMonto(String texto) {

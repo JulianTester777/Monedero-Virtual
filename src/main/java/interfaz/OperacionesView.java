@@ -11,6 +11,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
+import org.kordamp.ikonli.feather.Feather;
 import modelo.Cliente;
 import servicio.Banco;
 import servicio.OperacionInvalidaException;
@@ -80,10 +81,10 @@ final class OperacionesView implements Vista {
     }
 
     private FlowPane construirTabs() {
-        ToggleButton depositar = crearToggle("Depositar", "depositar");
-        ToggleButton retirar = crearToggle("Retirar", "retirar");
-        ToggleButton transferir = crearToggle("Transferir", "transferir");
-        ToggleButton canjear = crearToggle("Canjear", "canjear");
+        ToggleButton depositar = crearToggle("Depositar", "depositar", Feather.PLUS_CIRCLE);
+        ToggleButton retirar = crearToggle("Retirar", "retirar", Feather.MINUS_CIRCLE);
+        ToggleButton transferir = crearToggle("Transferir", "transferir", Feather.REPEAT);
+        ToggleButton canjear = crearToggle("Canjear", "canjear", Feather.GIFT);
 
         FlowPane tabs = new FlowPane(6, 6, depositar, retirar, transferir, canjear);
         tabs.getStyleClass().add("operation-tabs");
@@ -100,8 +101,9 @@ final class OperacionesView implements Vista {
         return tabs;
     }
 
-    private ToggleButton crearToggle(String texto, String valor) {
+    private ToggleButton crearToggle(String texto, String valor, Feather glifo) {
         ToggleButton boton = new ToggleButton(texto);
+        boton.setGraphic(Ui.icono(glifo, 14));
         boton.getStyleClass().add("operation-tab");
         boton.setUserData(valor);
         boton.setToggleGroup(operaciones);
@@ -205,6 +207,7 @@ final class OperacionesView implements Vista {
             case "canjear" -> "Canjear beneficio";
             default -> "Ejecutar";
         });
+        ejecutar.setGraphic(Ui.icono(iconoOperacion(), 15));
 
         Ui.ocultarFeedback(feedback);
         if (pideMonto) {
@@ -212,6 +215,16 @@ final class OperacionesView implements Vista {
         } else {
             beneficioCombo.requestFocus();
         }
+    }
+
+    /** Glifo del boton ejecutar, segun la operacion elegida. */
+    private Feather iconoOperacion() {
+        return switch (operacion) {
+            case "depositar" -> Feather.PLUS_CIRCLE;
+            case "retirar" -> Feather.MINUS_CIRCLE;
+            case "transferir" -> Feather.REPEAT;
+            default -> Feather.GIFT;
+        };
     }
 
     private String ayudaTexto() {

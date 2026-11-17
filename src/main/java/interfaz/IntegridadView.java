@@ -6,7 +6,9 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import org.kordamp.ikonli.feather.Feather;
 import modelo.Cliente;
 import servicio.Banco;
 import servicio.dto.IntegridadDto;
@@ -59,9 +61,11 @@ final class IntegridadView implements Vista {
         errores.setPrefHeight(320);
         errores.setPlaceholder(new Label("No se encontraron errores."));
         errores.setAccessibleText("Errores de integridad");
+        VBox.setVgrow(errores, Priority.ALWAYS);
 
         Button verificar = new Button("Verificar ahora");
         verificar.getStyleClass().add("primary-button");
+        verificar.setGraphic(Ui.icono(Feather.SHIELD, 15));
         verificar.setOnAction(evento -> alCambiar.run());
 
         VBox contenido = new VBox(18, titulo, intro, estado, errores, verificar);

@@ -1,8 +1,8 @@
-/* Pantalla de acceso. */
+/* Shizen: pantalla de acceso. Ma: aire alrededor del formulario. */
 
 .login-view {
     -fx-background-color: -fx-app-bg;
-    -fx-padding: 44 56 44 56;
+    -fx-padding: 48 56 48 56;
 }
 
 .login-view--compact {
@@ -10,5 +10,5 @@
 }
 
 .login-form {
-    -fx-max-width: 440;
+    -fx-max-width: 480;
 }

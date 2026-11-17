@@ -15,6 +15,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
+import org.kordamp.ikonli.feather.Feather;
 import modelo.Cliente;
 import modelo.Recurrencia;
 import servicio.Banco;
@@ -74,13 +75,16 @@ final class ProgramadasView implements Vista {
         lista.setPlaceholder(new Label("No tienes operaciones programadas."));
         lista.setAccessibleText("Operaciones programadas");
         lista.setCellFactory(v -> new ProgramadaCell());
+        VBox.setVgrow(lista, Priority.ALWAYS);
 
         Button cancelar = new Button("Cancelar seleccionada");
         cancelar.getStyleClass().add("secondary-button");
+        cancelar.setGraphic(Ui.icono(Feather.X, 14));
         cancelar.setOnAction(evento -> cancelarSeleccionada());
 
         Button procesar = new Button("Procesar pendientes");
         procesar.getStyleClass().add("primary-button");
+        procesar.setGraphic(Ui.icono(Feather.PLAY, 15));
         procesar.setOnAction(evento -> procesarPendientes());
 
         FlowPane acciones = new FlowPane(10, 10, cancelar, procesar);
@@ -97,8 +101,7 @@ final class ProgramadasView implements Vista {
     }
 
     private VBox crearFormulario() {
-        Label titulo = new Label("Nueva programada");
-        titulo.getStyleClass().add("section-title");
+        Label titulo = Ui.seccion("Nueva programada", Feather.CLOCK);
 
         tipoCombo.getItems().setAll("Depósito", "Retiro", "Transferencia");
         tipoCombo.setValue("Depósito");
@@ -152,6 +155,7 @@ final class ProgramadasView implements Vista {
 
         Button programar = new Button("Programar");
         programar.getStyleClass().add("primary-button");
+        programar.setGraphic(Ui.icono(Feather.CALENDAR, 15));
         programar.setMaxWidth(Double.MAX_VALUE);
         programar.setOnAction(evento -> programar());
 

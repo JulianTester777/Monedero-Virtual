@@ -6,7 +6,9 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import org.kordamp.ikonli.feather.Feather;
 import modelo.Cliente;
 import servicio.Banco;
 import servicio.dto.MovimientoDto;
@@ -59,29 +61,30 @@ final class ResumenView implements Vista {
         intro.setWrapText(true);
 
         FlowPane tarjetas = new FlowPane(14, 14,
-                tarjeta("Saldo en el monedero principal", saldo),
-                tarjeta("Saldo total", saldoTotal),
-                tarjeta("Puntos disponibles", disponibles),
-                tarjeta("Puntos acumulados", acumulados),
-                tarjeta("Rango actual", rango));
+                tarjeta("Saldo en el monedero principal", saldo, Feather.CREDIT_CARD),
+                tarjeta("Saldo total", saldoTotal, Feather.POCKET),
+                tarjeta("Puntos disponibles", disponibles, Feather.STAR),
+                tarjeta("Puntos acumulados", acumulados, Feather.TRENDING_UP),
+                tarjeta("Rango actual", rango, Feather.AWARD));
         tarjetas.getStyleClass().add("stat-grid");
 
-        Label tituloMovimientos = new Label("Últimos movimientos");
-        tituloMovimientos.getStyleClass().add("section-title");
+        Label tituloMovimientos = Ui.seccion("Últimos movimientos", Feather.LIST);
 
         lista.setPrefHeight(260);
         lista.setPlaceholder(new Label("Aún no hay movimientos. Empieza con un depósito."));
         lista.setAccessibleText("Últimos movimientos");
         lista.setCellFactory(v -> new MovimientoCell());
+        VBox.setVgrow(lista, Priority.ALWAYS);
 
         VBox contenido = new VBox(22, titulo, intro, tarjetas, tituloMovimientos, lista);
         contenido.getStyleClass().add("view-root");
         return contenido;
     }
 
-    private VBox tarjeta(String etiqueta, Label valor) {
+    private VBox tarjeta(String etiqueta, Label valor, Feather glifo) {
         Label titulo = new Label(etiqueta);
         titulo.getStyleClass().add("stat-label");
+        titulo.setGraphic(Ui.icono(glifo, 12));
         valor.getStyleClass().add("stat-value");
 
         VBox tarjeta = new VBox(6, titulo, valor);

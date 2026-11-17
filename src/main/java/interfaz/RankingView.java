@@ -67,6 +67,7 @@ final class RankingView implements Vista {
         lista.setPlaceholder(new Label("Todavía no hay clientes en el ranking."));
         lista.setAccessibleText("Ranking de clientes por puntos");
         lista.setCellFactory(v -> new RankingCell());
+        VBox.setVgrow(lista, Priority.ALWAYS);
 
         VBox contenido = new VBox(18, titulo, intro, posicion, lista);
         contenido.getStyleClass().add("view-root");

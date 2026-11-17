@@ -1,16 +1,17 @@
-/* Contenedor del dashboard y navegación entre vistas. */
+/* Shizen: contenedor del dashboard y navegacion.
+   Padding raiz = spacing.lg (32). Tabs de estructura en sumi. */
 
 .dashboard-view {
     -fx-background-color: -fx-app-bg;
-    -fx-padding: 26 34 34 34;
+    -fx-padding: 32 32 32 32;
 }
 
 .dashboard-view--compact {
-    -fx-padding: 18 16 26 16;
+    -fx-padding: 16 16 24 16;
 }
 
 .dashboard-header {
-    -fx-padding: 0 0 4 0;
+    -fx-padding: 0 0 12 0;
 }
 
 .dashboard-nav {
@@ -19,39 +20,75 @@
 
 .nav-tab {
     -fx-background-color: transparent;
-    -fx-background-radius: 8;
+    -fx-background-radius: 2;
     -fx-background-insets: 0;
     -fx-border-color: transparent;
-    -fx-border-radius: 8;
+    -fx-border-radius: 2;
     -fx-border-width: 2;
-    -fx-padding: 8 12;
+    -fx-padding: 6 14;
+    -fx-min-height: 44;
     -fx-text-fill: -fx-app-muted;
-    -fx-font-size: 12px;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
 }
 
 .nav-tab:hover {
     -fx-background-color: -fx-app-surface-2;
-    -fx-text-fill: -fx-app-pine;
+    -fx-text-fill: -fx-app-ink;
 }
 
 .nav-tab:selected {
-    -fx-background-color: -fx-app-pine;
-    -fx-text-fill: -fx-app-on-pine;
+    -fx-background-color: -fx-app-ink;
+    -fx-text-fill: -fx-app-on-sumi;
+    -fx-effect: dropshadow(gaussian, rgba(44, 44, 46, 0.18), 8, 0.10, 0, 2);
+}
+
+.nav-tab .ikonli-font-icon {
+    -fx-icon-color: -fx-app-muted;
+}
+
+.nav-tab:hover .ikonli-font-icon {
+    -fx-icon-color: -fx-app-ink;
+}
+
+.nav-tab:selected .ikonli-font-icon {
+    -fx-icon-color: -fx-app-on-sumi;
 }
 
 .nav-tab:selected:hover {
-    -fx-background-color: -fx-app-pine-2;
-    -fx-text-fill: -fx-app-on-pine;
+    -fx-background-color: -fx-app-muted;
+    -fx-text-fill: -fx-app-on-sumi;
 }
 
 .nav-tab:focused {
-    -fx-border-color: -fx-app-saffron;
-    -fx-padding: 8 12;
+    -fx-border-color: -fx-app-shu;
+    -fx-padding: 6 14;
 }
 
 .dashboard-content {
     -fx-background-color: transparent;
-    -fx-padding: 2 8 12 2;
+    -fx-padding: 4 0 16 0;
+}
+
+/* Barra lateral (modo amplio): navegacion vertical arriba y pase debajo. */
+
+.dashboard-sidebar {
+    -fx-background-color: transparent;
+    -fx-padding: 2 0 24 0;
+}
+
+.columna-nav {
+    -fx-padding: 0 0 4 0;
+}
+
+.columna-nav .nav-tab {
+    -fx-alignment: center-left;
+    -fx-padding: 10 14;
+}
+
+/* Pagina unica del modo compacto: un solo scroll con todo el contenido. */
+
+.dashboard-page {
+    -fx-padding: 2 2 24 2;
 }

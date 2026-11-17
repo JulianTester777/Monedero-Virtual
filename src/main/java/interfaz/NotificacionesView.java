@@ -13,6 +13,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import org.kordamp.ikonli.feather.Feather;
 import modelo.Cliente;
 import servicio.Banco;
 import servicio.OperacionInvalidaException;
@@ -72,13 +73,16 @@ final class NotificacionesView implements Vista {
         lista.setPlaceholder(new Label("No tienes avisos."));
         lista.setAccessibleText("Notificaciones");
         lista.setCellFactory(v -> new NotificacionCell());
+        VBox.setVgrow(lista, Priority.ALWAYS);
 
         Button leer = new Button("Marcar como leída");
         leer.getStyleClass().add("primary-button");
+        leer.setGraphic(Ui.icono(Feather.CHECK_CIRCLE, 15));
         leer.setOnAction(evento -> marcarLeida());
 
         Button siguienteAviso = new Button("Ver siguiente aviso");
         siguienteAviso.getStyleClass().add("secondary-button");
+        siguienteAviso.setGraphic(Ui.icono(Feather.CHEVRONS_RIGHT, 14));
         siguienteAviso.setOnAction(evento -> verSiguiente());
 
         FlowPane acciones = new FlowPane(10, 10, leer, siguienteAviso);
@@ -98,8 +102,7 @@ final class NotificacionesView implements Vista {
     }
 
     private VBox crearUmbral() {
-        Label titulo = new Label("Umbral de saldo bajo");
-        titulo.getStyleClass().add("section-title");
+        Label titulo = Ui.seccion("Umbral de saldo bajo", Feather.TRENDING_DOWN);
 
         umbralCampo.getStyleClass().add("text-field");
         umbralCampo.setText(Ui.monto(banco.consultarUmbralSaldoBajo()));
@@ -107,6 +110,7 @@ final class NotificacionesView implements Vista {
 
         Button guardar = new Button("Guardar umbral");
         guardar.getStyleClass().add("primary-button");
+        guardar.setGraphic(Ui.icono(Feather.CHECK, 15));
         guardar.setOnAction(evento -> guardarUmbral());
 
         VBox bloque = new VBox(10, titulo,

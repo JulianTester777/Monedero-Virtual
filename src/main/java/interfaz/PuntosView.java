@@ -13,6 +13,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import org.kordamp.ikonli.feather.Feather;
 import modelo.Cliente;
 import servicio.Banco;
 import servicio.OperacionInvalidaException;
@@ -76,9 +77,9 @@ final class PuntosView implements Vista {
         intro.setWrapText(true);
 
         FlowPane tarjetas = new FlowPane(14, 14,
-                tarjeta("Disponibles", disponibles),
-                tarjeta("Acumulados", acumulados),
-                tarjeta("Rango actual", rango));
+                tarjeta("Disponibles", disponibles, Feather.STAR),
+                tarjeta("Acumulados", acumulados, Feather.TRENDING_UP),
+                tarjeta("Rango actual", rango, Feather.AWARD));
         tarjetas.getStyleClass().add("stat-grid");
 
         VBox contenido = new VBox(22, titulo, intro, tarjetas,
@@ -87,9 +88,10 @@ final class PuntosView implements Vista {
         return contenido;
     }
 
-    private VBox tarjeta(String etiqueta, Label valor) {
+    private VBox tarjeta(String etiqueta, Label valor, Feather glifo) {
         Label titulo = new Label(etiqueta);
         titulo.getStyleClass().add("stat-label");
+        titulo.setGraphic(Ui.icono(glifo, 12));
         valor.getStyleClass().add("stat-value");
 
         VBox tarjeta = new VBox(6, titulo, valor);
@@ -98,8 +100,7 @@ final class PuntosView implements Vista {
     }
 
     private VBox construirProgreso() {
-        Label titulo = new Label("Progreso de rango");
-        titulo.getStyleClass().add("section-title");
+        Label titulo = Ui.seccion("Progreso de rango", Feather.TRENDING_UP);
 
         siguiente.getStyleClass().add("hint");
         siguiente.setWrapText(true);
@@ -113,13 +114,13 @@ final class PuntosView implements Vista {
     }
 
     private VBox construirHistorial() {
-        Label titulo = new Label("Movimientos de puntos");
-        titulo.getStyleClass().add("section-title");
+        Label titulo = Ui.seccion("Movimientos de puntos", Feather.LIST);
 
         historial.setPrefHeight(240);
         historial.setPlaceholder(new Label("Todavía no has ganado puntos."));
         historial.setAccessibleText("Historial de puntos");
         historial.setCellFactory(v -> new PuntosCell());
+        VBox.setVgrow(historial, Priority.ALWAYS);
 
         VBox bloque = new VBox(10, titulo, historial);
         bloque.getStyleClass().add("view-section");
@@ -127,8 +128,7 @@ final class PuntosView implements Vista {
     }
 
     private VBox construirBeneficios() {
-        Label titulo = new Label("Beneficios");
-        titulo.getStyleClass().add("section-title");
+        Label titulo = Ui.seccion("Beneficios", Feather.GIFT);
 
         Label intro = new Label("Canjea tus puntos disponibles. Los acumulados no bajan.");
         intro.getStyleClass().add("hint");

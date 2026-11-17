@@ -4,11 +4,16 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import servicio.dto.ResumenDto;
+
+import java.io.InputStream;
+import org.kordamp.ikonli.feather.Feather;
 
 /** Tarjeta de pase: identidad, saldo y escalera de rangos. */
 final class PassCard extends VBox {
@@ -62,7 +67,7 @@ final class PassCard extends VBox {
         }
         ladder.setCompacto(compacto);
         setMaxWidth(compacto ? Double.MAX_VALUE : anchoPreferido);
-        setPrefWidth(compacto ? 640 : anchoPreferido);
+        setPrefWidth(compacto ? Region.USE_COMPUTED_SIZE : anchoPreferido);
     }
 
     void setAnchoPreferido(double ancho) {
@@ -85,7 +90,24 @@ final class PassCard extends VBox {
 
         HBox cabecera = new HBox(12, marca, separador, contexto);
         cabecera.setAlignment(Pos.CENTER_LEFT);
+
+        ImageView sello = crearSello();
+        if (sello != null) {
+            cabecera.getChildren().add(0, sello);
+        }
         return cabecera;
+    }
+
+    /** Sello hanko del proyecto; se omite en silencio si el recurso falta. */
+    private ImageView crearSello() {
+        InputStream flujo = PassCard.class.getResourceAsStream("/interfaz/images/sello-monedero.png");
+        if (flujo == null) return null;
+        Image imagen = new Image(flujo, 28, 28, true, true);
+        if (imagen.isError()) return null;
+        ImageView sello = new ImageView(imagen);
+        sello.getStyleClass().add("pass-seal");
+        sello.setAccessibleRole(javafx.scene.AccessibleRole.IMAGE_VIEW);
+        return sello;
     }
 
     private Label construirLema(boolean modoLogin) {
@@ -100,14 +122,17 @@ final class PassCard extends VBox {
     private VBox construirDatos() {
         Label saldoEtiqueta = new Label("Saldo disponible");
         saldoEtiqueta.getStyleClass().add("pass-label");
+        saldoEtiqueta.setGraphic(Ui.icono(Feather.CREDIT_CARD, 11));
         saldoValor.getStyleClass().add("pass-balance");
 
         Label puntosEtiqueta = new Label("Puntos disponibles");
         puntosEtiqueta.getStyleClass().add("pass-label");
+        puntosEtiqueta.setGraphic(Ui.icono(Feather.STAR, 11));
         puntosValor.getStyleClass().add("pass-points");
 
         Label rangoEtiqueta = new Label("Rango actual");
         rangoEtiqueta.getStyleClass().add("pass-label");
+        rangoEtiqueta.setGraphic(Ui.icono(Feather.AWARD, 11));
         rangoValor.getStyleClass().add("pass-range");
 
         VBox saldoBloque = new VBox(2, saldoEtiqueta, saldoValor);
@@ -127,6 +152,7 @@ final class PassCard extends VBox {
     private VBox construirRangos(boolean modoLogin) {
         Label titulo = new Label("Rangos");
         titulo.getStyleClass().add("pass-label");
+        titulo.setGraphic(Ui.icono(Feather.TRENDING_UP, 11));
 
         siguiente.getStyleClass().add("pass-hint");
         siguiente.setWrapText(true);

@@ -1,0 +1,14 @@
+Iconos de la interfaz Shizen.
+
+Los glifos se renderizan con la libreria Ikonli 12.4.0 (org.kordamp.ikonli,
+Apache-2.0) y su pack Feather (ikonli-feather-pack), que incluye la fuente
+feather.ttf 4.28 del set Feather Icons de Cole Bemis (MIT).
+
+- LICENCIA-feather.txt: licencia MIT del set Feather Icons.
+- Los iconos se usan desde el codigo Java como constantes del enum
+  org.kordamp.ikonli.feather.Feather (ej. Feather.HOME); no hay archivos
+  SVG aqui: esta carpeta documenta la procedencia y conserva la licencia.
+- Nombres verificados contra el jar real del pack 12.4.0 (Maven Central).
+
+Regla acordada con el usuario: no se anade ningun icono nuevo a la interfaz
+sin preguntar antes.

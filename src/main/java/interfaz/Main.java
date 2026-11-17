@@ -3,11 +3,14 @@ package interfaz;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import modelo.Cliente;
 import modelo.TipoMonedero;
 import servicio.Banco;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,8 +23,14 @@ public final class Main extends Application {
             "base.css", "components.css", "login.css",
             "pass-card.css", "dashboard.css", "views.css");
 
+    private static final List<String> FUENTES = List.of(
+            "fonts/ZenOldMincho-Regular.ttf", "fonts/ZenOldMincho-Bold.ttf",
+            "fonts/ZenKakuGothicNew-Regular.ttf", "fonts/ZenKakuGothicNew-Bold.ttf");
+
     private Banco banco;
     private Scene escena;
+    private Cliente clienteActual;
+    private boolean temaOscuro;
 
     public static void main(String[] args) {
         launch(args);
@@ -29,6 +38,7 @@ public final class Main extends Application {
 
     @Override
     public void start(Stage stage) {
+        cargarFuentes();
         banco = crearBancoDemo();
         escena = new Scene(new StackPane(), 1120, 720);
         cargarEstilos();
@@ -49,12 +59,36 @@ public final class Main extends Application {
         }
     }
 
+    private void cargarFuentes() {
+        for (String fuente : FUENTES) {
+            try (InputStream flujo = Main.class.getResourceAsStream("/interfaz/" + fuente)) {
+                if (flujo != null) {
+                    Font.loadFont(flujo, 12);
+                }
+            } catch (IOException ex) {
+                System.err.println("No se pudo cargar la fuente " + fuente);
+            }
+        }
+    }
+
     private void mostrarLogin() {
-        escena.setRoot(new LoginView(banco, this::mostrarDashboard));
+        clienteActual = null;
+        escena.setRoot(new LoginView(banco, this::mostrarDashboard, this::alternarTema, temaOscuro));
     }
 
     private void mostrarDashboard(Cliente cliente) {
-        escena.setRoot(new DashboardView(banco, cliente, this::mostrarLogin));
+        clienteActual = cliente;
+        escena.setRoot(new DashboardView(banco, cliente,
+                this::mostrarLogin, this::alternarTema, temaOscuro));
+    }
+
+    private void alternarTema(boolean oscuro) {
+        temaOscuro = oscuro;
+        if (clienteActual != null) {
+            mostrarDashboard(clienteActual);
+        } else {
+            mostrarLogin();
+        }
     }
 
     private Banco crearBancoDemo() {

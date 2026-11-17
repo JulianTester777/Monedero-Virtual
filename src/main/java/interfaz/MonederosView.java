@@ -14,6 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import org.kordamp.ikonli.feather.Feather;
 import modelo.Cliente;
 import modelo.TipoMonedero;
 import servicio.Banco;
@@ -76,6 +77,7 @@ final class MonederosView implements Vista {
         lista.setPlaceholder(new Label("Todavía no hay monederos."));
         lista.setAccessibleText("Monederos del cliente");
         lista.setCellFactory(v -> new MonederoCell());
+        VBox.setVgrow(lista, Priority.ALWAYS);
 
         feedback.getStyleClass().add("feedback");
         feedback.setWrapText(true);
@@ -88,8 +90,7 @@ final class MonederosView implements Vista {
     }
 
     private VBox crearFormularioNuevo() {
-        Label titulo = new Label("Nuevo monedero");
-        titulo.getStyleClass().add("section-title");
+        Label titulo = Ui.seccion("Nuevo monedero", Feather.POCKET);
 
         idCampo.getStyleClass().add("text-field");
         idCampo.setPromptText("Ej. ahorro");
@@ -106,6 +107,7 @@ final class MonederosView implements Vista {
 
         Button crear = new Button("Crear monedero");
         crear.getStyleClass().add("primary-button");
+        crear.setGraphic(Ui.icono(Feather.PLUS, 14));
         crear.setMaxWidth(Double.MAX_VALUE);
         crear.setOnAction(evento -> crearMonedero());
 
@@ -116,8 +118,7 @@ final class MonederosView implements Vista {
     }
 
     private VBox crearFormularioTransferencia() {
-        Label titulo = new Label("Mover saldo entre monederos");
-        titulo.getStyleClass().add("section-title");
+        Label titulo = Ui.seccion("Mover saldo entre monederos", Feather.SHARE_2);
 
         origenCombo.setMaxWidth(Double.MAX_VALUE);
         origenCombo.setAccessibleText("Monedero de origen");
@@ -130,6 +131,7 @@ final class MonederosView implements Vista {
 
         Button mover = new Button("Mover saldo");
         mover.getStyleClass().add("primary-button");
+        mover.setGraphic(Ui.icono(Feather.REPEAT, 14));
         mover.setMaxWidth(Double.MAX_VALUE);
         mover.setOnAction(evento -> moverSaldo());
 

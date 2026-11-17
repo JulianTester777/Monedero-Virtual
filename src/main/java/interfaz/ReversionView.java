@@ -7,7 +7,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import org.kordamp.ikonli.feather.Feather;
 import modelo.Cliente;
 import servicio.Banco;
 import servicio.OperacionInvalidaException;
@@ -63,13 +65,16 @@ final class ReversionView implements Vista {
         lista.setPlaceholder(new Label("Cuando hagas una operación reversible aparecerá aquí."));
         lista.setAccessibleText("Operaciones reversibles");
         lista.setCellFactory(v -> new MovimientoCell());
+        VBox.setVgrow(lista, Priority.ALWAYS);
 
         Button seleccionada = new Button("Revertir seleccionada");
         seleccionada.getStyleClass().add("primary-button");
+        seleccionada.setGraphic(Ui.icono(Feather.ROTATE_CCW, 15));
         seleccionada.setOnAction(evento -> revertirSeleccionada());
 
         Button ultima = new Button("Revertir la última");
         ultima.getStyleClass().add("secondary-button");
+        ultima.setGraphic(Ui.icono(Feather.CORNER_DOWN_LEFT, 14));
         ultima.setOnAction(evento -> revertirUltima());
 
         FlowPane acciones = new FlowPane(10, 10, seleccionada, ultima);

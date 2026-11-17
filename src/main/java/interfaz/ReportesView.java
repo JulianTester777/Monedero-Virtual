@@ -9,6 +9,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+import org.kordamp.ikonli.feather.Feather;
 import modelo.Cliente;
 import servicio.Banco;
 import servicio.dto.FlujoDto;
@@ -76,17 +77,18 @@ final class ReportesView implements Vista {
 
         Button calcular = new Button("Calcular camino");
         calcular.getStyleClass().add("primary-button");
+        calcular.setGraphic(Ui.icono(Feather.COMPASS, 15));
         calcular.setOnAction(evento -> actualizar());
 
         FlowPane caminoFormulario = new FlowPane(10, 10, destinoCampo, calcular);
         caminoFormulario.getStyleClass().add("filter-row");
 
         VBox contenido = new VBox(18, titulo, intro, ciclos,
-                bloque("Categorías usadas", categorias),
-                bloque("Clientes relacionados", relacionados),
-                bloque("Clientes más conectados", conectados),
-                bloque("Flujos entre clientes", flujos),
-                bloque("Camino entre clientes", camino),
+                bloque("Categorías usadas", categorias, Feather.PIE_CHART),
+                bloque("Clientes relacionados", relacionados, Feather.USERS),
+                bloque("Clientes más conectados", conectados, Feather.SHARE_2),
+                bloque("Flujos entre clientes", flujos, Feather.TRENDING_UP),
+                bloque("Camino entre clientes", camino, Feather.MAP),
                 caminoFormulario);
         contenido.getStyleClass().add("view-root");
         return contenido;
@@ -97,9 +99,8 @@ final class ReportesView implements Vista {
         lista.setAccessibleText(accesible);
     }
 
-    private <T> VBox bloque(String titulo, ListView<T> lista) {
-        Label label = new Label(titulo);
-        label.getStyleClass().add("section-title");
+    private <T> VBox bloque(String titulo, ListView<T> lista, Feather glifo) {
+        Label label = Ui.seccion(titulo, glifo);
         VBox bloque = new VBox(8, label, lista);
         bloque.getStyleClass().add("view-section");
         return bloque;

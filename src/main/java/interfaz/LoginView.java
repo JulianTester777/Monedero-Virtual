@@ -8,10 +8,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import org.kordamp.ikonli.feather.Feather;
 import modelo.Cliente;
 import servicio.Banco;
 import servicio.OperacionInvalidaException;
@@ -20,39 +22,50 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 
-/** Pantalla de acceso por ID de cliente. */
-final class LoginView extends BorderPane {
+/**
+ * Pantalla de acceso por ID de cliente. Todo el contenido (pase, formulario y
+ * botón de tema) vive dentro de un único scroll vertical: en pantallas bajas
+ * nada queda fuera de alcance.
+ */
+final class LoginView extends ScrollPane {
+
+    private static final double ANCHO_COMPACTO = 900;
 
     private final Banco banco;
     private final Consumer<Cliente> alEntrar;
+    private final Consumer<Boolean> alTema;
+    private final boolean oscuro;
     private final PassCard pase = new PassCard(true);
     private final StackPane contenedorFormulario = new StackPane();
     private final TextField idCampo = new TextField();
     private final Label error = new Label();
-    private final ScrollPane scrollCompacto = new ScrollPane();
-    private final VBox compactoContenido = new VBox(24);
+    private final VBox pagina = new VBox(16);
+    private final HBox cuerpoAmplio = new HBox(32);
+    private final HBox filaSuperior = construirFilaSuperior();
 
     private boolean compacto;
     private boolean inicializado;
 
-    LoginView(Banco banco, Consumer<Cliente> alEntrar) {
+    LoginView(Banco banco, Consumer<Cliente> alEntrar, Consumer<Boolean> alTema, boolean oscuro) {
         this.banco = banco;
         this.alEntrar = alEntrar;
-        getStyleClass().add("login-view");
+        this.alTema = alTema;
+        this.oscuro = oscuro;
+        getStyleClass().addAll("login-view", "content-scroll");
+        if (oscuro) getStyleClass().add("theme-dark");
+
+        setFitToWidth(true);
+        setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        setContent(pagina);
 
         VBox formulario = construirFormulario();
         contenedorFormulario.getChildren().add(formulario);
         contenedorFormulario.setAlignment(Pos.CENTER_LEFT);
-
-        scrollCompacto.getStyleClass().add("content-scroll");
-        scrollCompacto.setFitToWidth(true);
-        scrollCompacto.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollCompacto.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollCompacto.setContent(compactoContenido);
-
-        setLeft(pase);
-        setCenter(contenedorFormulario);
-        BorderPane.setMargin(pase, new Insets(0, 48, 0, 0));
+        HBox.setHgrow(contenedorFormulario, Priority.ALWAYS);
+        HBox.setMargin(pase, new Insets(0, 48, 0, 0));
+        cuerpoAmplio.setAlignment(Pos.CENTER_LEFT);
+        cuerpoAmplio.setMaxWidth(Double.MAX_VALUE);
 
         widthProperty().addListener((obs, anterior, actual) -> adaptar(actual.doubleValue()));
         Platform.runLater(() -> {
@@ -78,8 +91,24 @@ final class LoginView extends BorderPane {
         VBox formulario = new VBox(16, titulo, intro, construirCampoId(), demo,
                 construirChipsDemo(), construirBotonEntrar(), error, construirNota());
         formulario.getStyleClass().add("login-form");
-        formulario.setMaxWidth(440);
+        formulario.setMaxWidth(480);
         return formulario;
+    }
+
+    private HBox construirFilaSuperior() {
+        Region espacio = new Region();
+        HBox.setHgrow(espacio, Priority.ALWAYS);
+
+        Button tema = new Button(oscuro ? "Tema claro" : "Tema oscuro");
+        tema.getStyleClass().add("chip");
+        tema.setGraphic(Ui.icono(oscuro ? Feather.SUN : Feather.MOON, 13));
+        tema.setAccessibleText(oscuro ? "Cambiar al tema claro" : "Cambiar al tema oscuro");
+        tema.setOnAction(evento -> alTema.accept(!oscuro));
+
+        HBox fila = new HBox(8, espacio, tema);
+        fila.setAlignment(Pos.CENTER_RIGHT);
+        fila.setMaxWidth(Double.MAX_VALUE);
+        return fila;
     }
 
     private VBox construirCampoId() {
@@ -117,6 +146,7 @@ final class LoginView extends BorderPane {
     private Button construirBotonEntrar() {
         Button entrar = new Button("Entrar");
         entrar.getStyleClass().add("primary-button");
+        entrar.setGraphic(Ui.icono(Feather.LOG_IN, 15));
         entrar.setMaxWidth(Double.MAX_VALUE);
         entrar.setDefaultButton(true);
         entrar.setOnAction(evento -> intentarEntrar());
@@ -169,7 +199,7 @@ final class LoginView extends BorderPane {
     }
 
     private void adaptar(double ancho) {
-        boolean nuevoCompacto = ancho < 900;
+        boolean nuevoCompacto = ancho < ANCHO_COMPACTO;
         if (inicializado && nuevoCompacto == compacto) return;
         compacto = nuevoCompacto;
         inicializado = true;
@@ -177,19 +207,12 @@ final class LoginView extends BorderPane {
         pase.setCompacto(compacto);
         if (compacto) {
             if (!getStyleClass().contains("login-view--compact")) getStyleClass().add("login-view--compact");
-            setLeft(null);
-            setTop(null);
-            setCenter(null);
-            compactoContenido.getChildren().setAll(pase, contenedorFormulario);
-            setCenter(scrollCompacto);
+            cuerpoAmplio.getChildren().clear();
+            pagina.getChildren().setAll(filaSuperior, pase, contenedorFormulario);
         } else {
             getStyleClass().remove("login-view--compact");
-            compactoContenido.getChildren().clear();
-            setCenter(null);
-            setTop(null);
-            setLeft(pase);
-            setCenter(contenedorFormulario);
-            BorderPane.setMargin(pase, new Insets(0, 48, 0, 0));
+            pagina.getChildren().setAll(filaSuperior, cuerpoAmplio);
+            cuerpoAmplio.getChildren().setAll(pase, contenedorFormulario);
         }
     }
 }

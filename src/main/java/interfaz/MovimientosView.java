@@ -7,6 +7,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import modelo.Cliente;
 import servicio.Banco;
@@ -78,6 +79,7 @@ final class MovimientosView implements Vista {
         lista.setPlaceholder(new Label("No hay movimientos para este filtro."));
         lista.setAccessibleText("Historial de movimientos");
         lista.setCellFactory(v -> new MovimientoCell());
+        VBox.setVgrow(lista, Priority.ALWAYS);
 
         VBox contenido = new VBox(18, titulo, intro, barraFiltro, resumen, lista);
         contenido.getStyleClass().add("view-root");

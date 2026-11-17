@@ -1,29 +1,43 @@
-/* Variables, tipografía y controles comunes. */
+/* Shizen: variables, tipografia y controles comunes.
+   Kanso (simpleza) + ma (espacio). Papel washi, tinta sumi, acento shu < 10%.
+   Sin gradientes; sombras suaves de papel pedidas por el usuario. */
 
 .root {
-    -fx-app-bg: #E7EEE9;
-    -fx-app-surface: #F4F7F3;
-    -fx-app-surface-2: #DCE8E1;
-    -fx-app-ink: #14201B;
-    -fx-app-muted: #53645C;
-    -fx-app-pine: #123B32;
-    -fx-app-pine-2: #1B4A3F;
-    -fx-app-saffron: #E2A72E;
-    -fx-app-error: #A33A2E;
-    -fx-app-line: #C9D8CF;
-    -fx-app-on-pine: #F4F7F3;
-    -fx-app-on-pine-muted: #B7C9C0;
+    /* Familia shu (acento) */
+    -fx-app-shu: #9B3B3B;
+    -fx-app-shu-dark: #7A2E2E;
+    -fx-app-shu-light: #C46A6A;
+
+    /* Familia sumi (texto y estructura) */
+    -fx-app-ink: #2C2C2E;
+    -fx-app-muted: #4A4A4E;
+
+    /* Papel */
+    -fx-app-bg: #F5F1EA;
+    -fx-app-surface: #F5F1EA;
+    -fx-app-surface-2: #EDE8DF;
+
+    /* Metales y planta */
+    -fx-app-kin: #B5A78C;
+    -fx-app-kin-ash: #8A8580;
+    -fx-app-moss: #5E6E52;
+
+    -fx-app-line: #B5A78C;
+    -fx-app-on-shu: #F5F1EA;
+    -fx-app-on-sumi: #F5F1EA;
 
     -fx-background-color: -fx-app-bg;
-    -fx-font-family: "Segoe UI";
-    -fx-font-size: 14px;
+    -fx-font-family: "Zen Kaku Gothic New";
+    -fx-font-size: 15px;
     -fx-text-fill: -fx-app-ink;
-    -fx-focus-color: -fx-app-saffron;
-    -fx-faint-focus-color: rgba(226, 167, 46, 0.20);
+    -fx-focus-color: -fx-app-shu;
+    -fx-faint-focus-color: rgba(155, 59, 59, 0.18);
 }
 
+/* Tipografia: Mincho para titulos y cifras, Gotica para lectura. */
+
 .display-title {
-    -fx-font-family: "Bahnschrift";
+    -fx-font-family: "Zen Old Mincho";
     -fx-font-size: 34px;
     -fx-font-weight: bold;
     -fx-text-fill: -fx-app-ink;
@@ -31,149 +45,317 @@
 
 .login-view--compact .display-title,
 .dashboard-view--compact .display-title {
-    -fx-font-size: 27px;
+    -fx-font-size: 26px;
 }
 
 .lead {
-    -fx-font-size: 15px;
+    -fx-font-size: 17px;
     -fx-text-fill: -fx-app-muted;
+    -fx-max-width: 600;
 }
 
 .section-title {
-    -fx-font-family: "Bahnschrift";
-    -fx-font-size: 20px;
+    -fx-font-family: "Zen Old Mincho";
+    -fx-font-size: 24px;
     -fx-font-weight: bold;
-    -fx-text-fill: -fx-app-pine;
+    -fx-text-fill: -fx-app-ink;
 }
 
 .hint {
+    -fx-font-size: 14px;
+    -fx-text-fill: -fx-app-muted;
+    -fx-max-width: 600;
+}
+
+.field-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-app-ink;
+    -fx-padding: 0 0 4 0;
+}
+
+.fine-print {
     -fx-font-size: 13px;
     -fx-text-fill: -fx-app-muted;
 }
 
-.field-label {
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-text-fill: -fx-app-pine;
-    -fx-padding: 0 0 1 0;
-}
-
-.fine-print {
-    -fx-font-size: 12px;
-    -fx-text-fill: #6A7A72;
-}
-
 .text-field {
     -fx-background-color: -fx-app-surface;
-    -fx-background-radius: 8;
+    -fx-background-radius: 2;
     -fx-background-insets: 0;
-    -fx-border-color: -fx-app-line;
-    -fx-border-radius: 8;
+    -fx-border-color: -fx-app-kin-ash;
+    -fx-border-radius: 2;
     -fx-border-width: 1;
-    -fx-padding: 12 13;
+    -fx-padding: 12 14;
     -fx-text-fill: -fx-app-ink;
-    -fx-prompt-text-fill: #7B8A83;
-    -fx-highlight-fill: -fx-app-saffron;
-    -fx-highlight-text-fill: -fx-app-pine;
+    -fx-prompt-text-fill: #8A8580;
+    -fx-highlight-fill: -fx-app-shu;
+    -fx-highlight-text-fill: -fx-app-on-shu;
+}
+
+.text-field:hover {
+    -fx-border-color: -fx-app-ink;
 }
 
 .text-field:focused {
-    -fx-border-color: -fx-app-saffron;
+    -fx-border-color: -fx-app-shu;
     -fx-border-width: 2;
-    -fx-padding: 11 12;
+    -fx-padding: 11 13;
 }
 
 .amount-field {
-    -fx-font-family: "Bahnschrift";
-    -fx-font-size: 20px;
+    -fx-font-family: "Zen Old Mincho";
+    -fx-font-size: 22px;
     -fx-font-weight: bold;
 }
 
+/* Chips de demo: unico elemento redondo completo (rounded.full). */
+
 .chip {
     -fx-background-color: transparent;
-    -fx-background-radius: 20;
+    -fx-background-radius: 9999;
     -fx-background-insets: 0;
-    -fx-border-color: -fx-app-line;
-    -fx-border-radius: 20;
+    -fx-border-color: -fx-app-kin-ash;
+    -fx-border-radius: 9999;
     -fx-border-width: 1;
-    -fx-padding: 8 13;
-    -fx-text-fill: -fx-app-pine;
-    -fx-font-size: 12px;
+    -fx-padding: 6 16;
+    -fx-min-height: 44;
+    -fx-text-fill: -fx-app-ink;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
 }
 
 .chip:hover {
     -fx-background-color: -fx-app-surface-2;
+    -fx-translate-y: -1;
+    -fx-effect: dropshadow(gaussian, rgba(44, 44, 46, 0.14), 8, 0.10, 0, 2);
 }
 
 .chip:pressed {
-    -fx-background-color: #CEDFD5;
+    -fx-background-color: -fx-app-kin;
+    -fx-translate-y: 1;
+    -fx-effect: null;
 }
 
 .chip:focused {
-    -fx-border-color: -fx-app-saffron;
+    -fx-border-color: -fx-app-shu;
     -fx-border-width: 2;
-    -fx-padding: 7 12;
+    -fx-padding: 5 15;
 }
 
+/* Accion principal: el rojo shu vive aqui. */
+
 .primary-button {
-    -fx-background-color: -fx-app-pine;
-    -fx-background-radius: 8;
+    -fx-background-color: -fx-app-shu;
+    -fx-background-radius: 2;
     -fx-background-insets: 0;
     -fx-border-color: transparent;
-    -fx-border-radius: 8;
+    -fx-border-radius: 2;
     -fx-border-width: 2;
-    -fx-padding: 12 17;
-    -fx-text-fill: -fx-app-on-pine;
-    -fx-font-size: 14px;
+    -fx-padding: 12 20;
+    -fx-min-height: 44;
+    -fx-text-fill: -fx-app-on-shu;
+    -fx-font-size: 15px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(44, 44, 46, 0.22), 8, 0.10, 0, 2);
 }
 
 .primary-button:hover {
-    -fx-background-color: -fx-app-pine-2;
+    -fx-background-color: -fx-app-shu-dark;
+    -fx-translate-y: -1;
+    -fx-effect: dropshadow(gaussian, rgba(44, 44, 46, 0.28), 12, 0.10, 0, 4);
 }
 
 .primary-button:pressed {
-    -fx-background-color: #0E2F28;
+    -fx-background-color: -fx-app-shu-dark;
+    -fx-translate-y: 1;
+    -fx-effect: dropshadow(gaussian, rgba(44, 44, 46, 0.14), 5, 0.10, 0, 1);
 }
 
 .primary-button:focused {
-    -fx-border-color: -fx-app-saffron;
+    -fx-border-color: -fx-app-ink;
 }
+
+.primary-button:disabled {
+    -fx-background-color: -fx-app-surface-2;
+    -fx-border-color: transparent;
+    -fx-text-fill: -fx-app-kin-ash;
+    -fx-translate-y: 0;
+    -fx-effect: null;
+}
+
+/* Accion secundaria: trazo, sin relleno. */
 
 .secondary-button {
     -fx-background-color: transparent;
-    -fx-background-radius: 8;
+    -fx-background-radius: 2;
     -fx-background-insets: 0;
-    -fx-border-color: -fx-app-line;
-    -fx-border-radius: 8;
+    -fx-border-color: -fx-app-kin-ash;
+    -fx-border-radius: 2;
     -fx-border-width: 1;
-    -fx-padding: 8 13;
-    -fx-text-fill: -fx-app-pine;
-    -fx-font-size: 12px;
+    -fx-padding: 11 18;
+    -fx-min-height: 44;
+    -fx-text-fill: -fx-app-ink;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
 }
 
 .secondary-button:hover {
     -fx-background-color: -fx-app-surface-2;
+    -fx-translate-y: -1;
+    -fx-effect: dropshadow(gaussian, rgba(44, 44, 46, 0.14), 8, 0.10, 0, 2);
+}
+
+.secondary-button:pressed {
+    -fx-translate-y: 1;
+    -fx-effect: null;
 }
 
 .secondary-button:focused {
-    -fx-border-color: -fx-app-saffron;
+    -fx-border-color: -fx-app-shu;
     -fx-border-width: 2;
-    -fx-padding: 7 12;
+    -fx-padding: 10 17;
+}
+
+.secondary-button:disabled {
+    -fx-text-fill: -fx-app-kin-ash;
+    -fx-border-color: -fx-app-kin;
+    -fx-translate-y: 0;
+    -fx-effect: null;
 }
 
 .wordmark {
-    -fx-font-family: "Bahnschrift";
+    -fx-font-family: "Zen Old Mincho";
     -fx-font-size: 22px;
     -fx-font-weight: bold;
-    -fx-text-fill: -fx-app-pine;
+    -fx-text-fill: -fx-app-ink;
 }
 
 .wordmark--small {
     -fx-font-size: 19px;
+}
+
+/* Iconos Feather (Ikonli): el tamano se fija en Java; el color sigue el
+   contexto y, al usar tokens, el modo oscuro se ajusta solo. */
+
+.nav-tab,
+.primary-button,
+.secondary-button,
+.chip,
+.operation-tab {
+    -fx-graphic-text-gap: 8;
+}
+
+.section-title {
+    -fx-graphic-text-gap: 10;
+}
+
+.pass-label,
+.stat-label {
+    -fx-graphic-text-gap: 6;
+}
+
+.ikonli-font-icon {
+    -fx-icon-color: -fx-app-ink;
+}
+
+.section-title .ikonli-font-icon {
+    -fx-icon-color: -fx-app-shu;
+}
+
+.primary-button .ikonli-font-icon {
+    -fx-icon-color: -fx-app-on-shu;
+}
+
+.pass-label .ikonli-font-icon,
+.stat-label .ikonli-font-icon {
+    -fx-icon-color: -fx-app-kin-ash;
+}
+
+/* Modo oscuro: carbón con acentos shu claros. Se activa con .theme-dark
+   en la raíz de la escena; todos los tokens se redefinen aquí. */
+
+.root.theme-dark {
+    -fx-app-shu: #CB7474;
+    -fx-app-shu-dark: #D89292;
+    -fx-app-shu-light: #8F4A4A;
+    -fx-app-ink: #F5F1EA;
+    -fx-app-muted: #C9C4BA;
+    -fx-app-bg: #242428;
+    -fx-app-surface: #242428;
+    -fx-app-surface-2: #313136;
+    -fx-app-kin: #55524B;
+    -fx-app-kin-ash: #847E71;
+    -fx-app-moss: #A7B99A;
+    -fx-app-on-shu: #242428;
+    -fx-app-on-sumi: #2C2C2E;
+    -fx-focus-color: #CB7474;
+    -fx-faint-focus-color: rgba(203, 116, 116, 0.25);
+}
+
+.theme-dark .primary-button {
+    -fx-background-color: #A84848;
+    -fx-border-color: rgba(245, 241, 234, 0.30);
+    -fx-text-fill: #F5F1EA;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.50), 8, 0.10, 0, 2);
+}
+
+.theme-dark .primary-button:hover {
+    -fx-background-color: #B45454;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.55), 12, 0.10, 0, 4);
+}
+
+.theme-dark .primary-button:pressed {
+    -fx-background-color: #B45454;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.40), 5, 0.10, 0, 1);
+}
+
+.theme-dark .primary-button:focused {
+    -fx-border-color: -fx-app-ink;
+}
+
+.theme-dark .primary-button .ikonli-font-icon {
+    -fx-icon-color: #F5F1EA;
+}
+
+.theme-dark .primary-button:disabled {
+    -fx-background-color: -fx-app-surface-2;
+    -fx-border-color: transparent;
+    -fx-text-fill: #847E71;
+    -fx-effect: null;
+}
+
+.theme-dark .text-field {
+    -fx-highlight-fill: -fx-app-ink;
+    -fx-highlight-text-fill: #2C2C2E;
+}
+
+.theme-dark .secondary-button:disabled {
+    -fx-text-fill: #847E71;
+    -fx-border-color: -fx-app-kin;
+}
+
+.theme-dark .content-scroll .scroll-bar .thumb,
+.theme-dark .list-view .scroll-bar .thumb {
+    -fx-background-color: rgba(245, 241, 234, 0.22);
+}
+
+.theme-dark .action-panel,
+.theme-dark .ranking-panel,
+.theme-dark .stat-card,
+.theme-dark .benefit-card {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 10, 0.10, 0, 3);
+}
+
+.theme-dark .pass-card {
+    -fx-background-image: null;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.55), 16, 0.10, 0, 5);
+}
+
+.theme-dark .nav-tab:selected,
+.theme-dark .nav-tab:selected:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 8, 0.10, 0, 2);
 }

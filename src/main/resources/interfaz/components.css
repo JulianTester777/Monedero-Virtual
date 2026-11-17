@@ -1,4 +1,4 @@
-/* Componentes compartidos: scroll, paneles, listas, feedback y combo. */
+/* Shizen: componentes compartidos. Papel, hairline kin, esquinas de 4px. */
 
 .content-scroll {
     -fx-background-color: transparent;
@@ -24,8 +24,8 @@
 }
 
 .content-scroll .scroll-bar .thumb {
-    -fx-background-color: rgba(18, 59, 50, 0.20);
-    -fx-background-radius: 6;
+    -fx-background-color: rgba(44, 44, 46, 0.28);
+    -fx-background-radius: 4;
 }
 
 .content-scroll .scroll-bar .increment-button,
@@ -35,154 +35,190 @@
     -fx-opacity: 0;
 }
 
+/* Paneles: hoja de papel washi oscuro sobre el fondo, sin sombra. */
+
 .action-panel,
 .ranking-panel {
-    -fx-background-color: -fx-app-surface;
-    -fx-background-radius: 14;
-    -fx-border-color: -fx-app-line;
-    -fx-border-radius: 14;
+    -fx-background-color: -fx-app-surface-2;
+    -fx-background-radius: 4;
+    -fx-border-color: -fx-app-kin;
+    -fx-border-radius: 4;
     -fx-border-width: 1;
     -fx-padding: 20;
-    -fx-effect: dropshadow(gaussian, rgba(18, 59, 50, 0.06), 16, 0, 0, 6);
+    -fx-effect: dropshadow(gaussian, rgba(44, 44, 46, 0.10), 10, 0.10, 0, 3);
 }
 
 .dashboard-view--compact .action-panel,
 .dashboard-view--compact .ranking-panel {
-    -fx-padding: 18;
+    -fx-padding: 16;
 }
 
 .operation-tab {
     -fx-background-color: transparent;
-    -fx-background-radius: 7;
+    -fx-background-radius: 2;
     -fx-background-insets: 0;
-    -fx-border-color: -fx-app-line;
-    -fx-border-radius: 7;
+    -fx-border-color: -fx-app-kin-ash;
+    -fx-border-radius: 2;
     -fx-border-width: 1;
-    -fx-padding: 8 11;
+    -fx-padding: 6 14;
+    -fx-min-height: 44;
     -fx-text-fill: -fx-app-muted;
-    -fx-font-size: 12px;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
 }
 
 .operation-tab:hover {
     -fx-background-color: -fx-app-surface-2;
-    -fx-text-fill: -fx-app-pine;
+    -fx-text-fill: -fx-app-ink;
+    -fx-translate-y: -1;
+    -fx-effect: dropshadow(gaussian, rgba(44, 44, 46, 0.12), 8, 0.10, 0, 2);
 }
 
+/* Seleccion de estructura en tinta sumi; el shu queda para acciones. */
+
 .operation-tab:selected {
-    -fx-background-color: -fx-app-pine;
-    -fx-border-color: -fx-app-pine;
-    -fx-text-fill: -fx-app-on-pine;
+    -fx-background-color: -fx-app-ink;
+    -fx-border-color: -fx-app-ink;
+    -fx-text-fill: -fx-app-on-sumi;
+    -fx-effect: dropshadow(gaussian, rgba(44, 44, 46, 0.16), 8, 0.10, 0, 2);
 }
 
 .operation-tab:selected:hover {
-    -fx-background-color: -fx-app-pine-2;
-    -fx-text-fill: -fx-app-on-pine;
+    -fx-background-color: -fx-app-muted;
+    -fx-text-fill: -fx-app-on-sumi;
+    -fx-translate-y: -1;
+}
+
+.operation-tab:pressed {
+    -fx-translate-y: 1;
+    -fx-effect: null;
+}
+
+.operation-tab .ikonli-font-icon {
+    -fx-icon-color: -fx-app-muted;
+}
+
+.operation-tab:hover .ikonli-font-icon {
+    -fx-icon-color: -fx-app-ink;
+}
+
+.operation-tab:selected .ikonli-font-icon {
+    -fx-icon-color: -fx-app-on-sumi;
 }
 
 .operation-tab:focused {
-    -fx-border-color: -fx-app-saffron;
+    -fx-border-color: -fx-app-shu;
     -fx-border-width: 2;
-    -fx-padding: 7 10;
+    -fx-padding: 5 13;
 }
 
 .combo-box {
     -fx-background-color: -fx-app-surface;
-    -fx-background-radius: 8;
-    -fx-border-color: -fx-app-line;
-    -fx-border-radius: 8;
+    -fx-background-radius: 2;
+    -fx-border-color: -fx-app-kin-ash;
+    -fx-border-radius: 2;
     -fx-border-width: 1;
     -fx-padding: 1;
+    -fx-min-height: 44;
 }
 
 .combo-box > .list-cell {
     -fx-background-color: transparent;
     -fx-text-fill: -fx-app-ink;
-    -fx-padding: 9 10;
+    -fx-padding: 10 12;
 }
 
 .combo-box .arrow-button {
     -fx-background-color: transparent;
-    -fx-padding: 0 9 0 0;
+    -fx-padding: 0 12 0 0;
 }
 
 .combo-box .arrow {
-    -fx-background-color: -fx-app-pine;
+    -fx-background-color: -fx-app-ink;
+}
+
+.combo-box:hover {
+    -fx-border-color: -fx-app-ink;
 }
 
 .combo-box:focused {
-    -fx-border-color: -fx-app-saffron;
+    -fx-border-color: -fx-app-shu;
     -fx-border-width: 2;
     -fx-padding: 0;
 }
 
 .combo-box-popup .list-view {
-    -fx-background-color: -fx-app-surface;
-    -fx-background-radius: 8;
-    -fx-border-color: -fx-app-line;
-    -fx-border-radius: 8;
+    -fx-background-color: -fx-app-surface-2;
+    -fx-background-radius: 2;
+    -fx-border-color: -fx-app-kin;
+    -fx-border-radius: 2;
     -fx-border-width: 1;
 }
 
 .combo-box-popup .list-view .list-cell {
     -fx-background-color: transparent;
     -fx-text-fill: -fx-app-ink;
-    -fx-padding: 9 10;
+    -fx-padding: 10 12;
 }
 
 .combo-box-popup .list-view .list-cell:filled:hover {
-    -fx-background-color: -fx-app-surface-2;
+    -fx-background-color: -fx-app-surface;
 }
 
 .combo-box-popup .list-view .list-cell:filled:selected {
-    -fx-background-color: -fx-app-pine;
-    -fx-text-fill: -fx-app-on-pine;
+    -fx-background-color: -fx-app-ink;
+    -fx-text-fill: -fx-app-on-sumi;
 }
 
+/* Feedback: tinta y planta sobre papel; el rojo solo en error. */
+
 .form-error {
-    -fx-background-color: #F8E6E2;
-    -fx-background-radius: 8;
-    -fx-border-color: #E7BDB4;
-    -fx-border-radius: 8;
+    -fx-background-color: -fx-app-surface-2;
+    -fx-background-radius: 2;
+    -fx-border-color: -fx-app-shu-light;
+    -fx-border-radius: 2;
     -fx-border-width: 1;
     -fx-padding: 10 12;
-    -fx-text-fill: -fx-app-error;
+    -fx-text-fill: -fx-app-shu-dark;
     -fx-font-size: 13px;
 }
 
 .feedback {
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
+    -fx-background-color: -fx-app-surface-2;
+    -fx-background-radius: 2;
+    -fx-border-color: -fx-app-kin;
+    -fx-border-radius: 2;
     -fx-border-width: 1;
     -fx-padding: 10 12;
     -fx-font-size: 13px;
+    -fx-text-fill: -fx-app-muted;
 }
 
 .feedback--ok {
-    -fx-background-color: #E3F0E8;
-    -fx-border-color: #B9D8C6;
-    -fx-text-fill: #1B5A3F;
+    -fx-border-color: -fx-app-moss;
+    -fx-text-fill: -fx-app-moss;
 }
 
 .feedback--error {
-    -fx-background-color: #F8E6E2;
-    -fx-border-color: #E7BDB4;
-    -fx-text-fill: -fx-app-error;
+    -fx-border-color: -fx-app-shu-light;
+    -fx-text-fill: -fx-app-shu-dark;
 }
+
+/* Listas: borde hairline, filas respirando, seleccion en papel oscuro. */
 
 .list-view {
     -fx-background-color: transparent;
-    -fx-background-radius: 10;
+    -fx-background-radius: 4;
     -fx-background-insets: 0;
-    -fx-border-color: -fx-app-line;
-    -fx-border-radius: 10;
+    -fx-border-color: -fx-app-kin;
+    -fx-border-radius: 4;
     -fx-border-width: 1;
     -fx-padding: 4;
 }
 
 .list-view:focused {
-    -fx-border-color: -fx-app-saffron;
+    -fx-border-color: -fx-app-shu;
     -fx-border-width: 2;
 }
 
@@ -192,14 +228,14 @@
 }
 
 .list-view .list-cell:filled:hover {
-    -fx-background-color: rgba(220, 232, 225, 0.70);
-    -fx-background-radius: 8;
+    -fx-background-color: rgba(237, 232, 223, 0.70);
+    -fx-background-radius: 2;
 }
 
 .list-view .list-cell:filled:selected,
 .list-view .list-cell:filled:selected:hover {
     -fx-background-color: -fx-app-surface-2;
-    -fx-background-radius: 8;
+    -fx-background-radius: 2;
 }
 
 .list-view .list-cell:focused {
@@ -208,7 +244,7 @@
 
 .list-view .placeholder .label {
     -fx-text-fill: -fx-app-muted;
-    -fx-font-size: 13px;
+    -fx-font-size: 14px;
 }
 
 .list-view .scroll-bar {
@@ -221,7 +257,7 @@
 }
 
 .list-view .scroll-bar .thumb {
-    -fx-background-color: rgba(18, 59, 50, 0.18);
+    -fx-background-color: rgba(44, 44, 46, 0.24);
     -fx-background-radius: 4;
 }
 
@@ -232,70 +268,74 @@
     -fx-opacity: 0;
 }
 
+/* Filas de datos. */
+
 .movement-row {
-    -fx-padding: 11 4;
+    -fx-padding: 12 4;
 }
 
 .movement-type {
-    -fx-font-size: 13px;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-text-fill: -fx-app-ink;
 }
 
 .movement-meta {
-    -fx-font-size: 12px;
+    -fx-font-size: 13px;
     -fx-text-fill: -fx-app-muted;
 }
 
 .movement-amount {
-    -fx-font-family: "Bahnschrift";
-    -fx-font-size: 15px;
+    -fx-font-family: "Zen Old Mincho";
+    -fx-font-size: 17px;
     -fx-font-weight: bold;
 }
 
 .movement-amount--in {
-    -fx-text-fill: #1F6B4A;
+    -fx-text-fill: -fx-app-moss;
 }
 
+/* El dinero que sale es la senal que importa: rojo shu. */
+
 .movement-amount--out {
-    -fx-text-fill: #8A3B2F;
+    -fx-text-fill: -fx-app-shu;
 }
 
 .movement-points {
-    -fx-font-size: 11px;
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-text-fill: -fx-app-pine;
+    -fx-text-fill: -fx-app-muted;
 }
 
 .ranking-row {
-    -fx-padding: 10 4;
-    -fx-border-color: -fx-app-line;
+    -fx-padding: 12 4;
+    -fx-border-color: -fx-app-kin;
     -fx-border-width: 0 0 1 0;
 }
 
 .ranking-row--me {
     -fx-background-color: -fx-app-surface-2;
-    -fx-background-radius: 8;
-    -fx-padding: 10 8;
+    -fx-background-radius: 2;
+    -fx-padding: 12 8;
 }
 
 .ranking-position {
-    -fx-font-family: "Bahnschrift";
-    -fx-font-size: 15px;
+    -fx-font-family: "Zen Old Mincho";
+    -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-text-fill: -fx-app-muted;
-    -fx-min-width: 22;
+    -fx-min-width: 24;
     -fx-alignment: center;
 }
 
 .ranking-name {
-    -fx-font-size: 13px;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-text-fill: -fx-app-ink;
 }
 
 .ranking-points {
-    -fx-font-size: 12px;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-text-fill: -fx-app-pine;
+    -fx-text-fill: -fx-app-muted;
 }

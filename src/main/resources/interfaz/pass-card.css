@@ -1,13 +1,16 @@
-/* Tarjeta de pase y escalera de rangos. */
+/* Shizen: tarjeta de pase y escalera de rangos.
+   Hoja de papel washi-dark con textura de fibra (modo claro), filete
+   superior shu, sello hanko y sombra suave de papel. */
 
 .pass-card {
-    -fx-background-color: -fx-app-saffron, -fx-app-pine;
-    -fx-background-insets: 0, 5 0 0 0;
-    -fx-background-radius: 18, 0 0 18 18;
-    -fx-border-color: rgba(244, 247, 243, 0.10);
-    -fx-border-radius: 18;
-    -fx-border-width: 1;
-    -fx-effect: dropshadow(gaussian, rgba(18, 59, 50, 0.22), 28, 0.10, 0, 12);
+    -fx-background-color: -fx-app-surface-2;
+    -fx-background-image: url("images/papel-washi.png");
+    -fx-background-repeat: repeat;
+    -fx-background-radius: 4;
+    -fx-border-color: -fx-app-shu -fx-app-kin -fx-app-kin -fx-app-kin;
+    -fx-border-width: 3 1 1 1;
+    -fx-border-radius: 4;
+    -fx-effect: dropshadow(gaussian, rgba(44, 44, 46, 0.16), 16, 0.10, 0, 5);
 }
 
 .pass-card--compact {
@@ -15,59 +18,61 @@
 }
 
 .pass-card .wordmark {
-    -fx-text-fill: -fx-app-on-pine;
+    -fx-text-fill: -fx-app-ink;
 }
 
 .pass-kicker {
-    -fx-font-size: 11px;
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-text-fill: -fx-app-on-pine-muted;
+    -fx-text-fill: -fx-app-muted;
 }
 
 .pass-lead {
     -fx-font-size: 16px;
-    -fx-text-fill: -fx-app-on-pine;
+    -fx-text-fill: -fx-app-ink;
 }
 
 .pass-label {
-    -fx-font-size: 11px;
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-text-fill: -fx-app-on-pine-muted;
+    -fx-text-fill: -fx-app-muted;
 }
 
 .pass-balance {
-    -fx-font-family: "Bahnschrift";
-    -fx-font-size: 34px;
+    -fx-font-family: "Zen Old Mincho";
+    -fx-font-size: 36px;
     -fx-font-weight: bold;
-    -fx-text-fill: -fx-app-on-pine;
+    -fx-text-fill: -fx-app-ink;
 }
 
 .pass-points {
-    -fx-font-family: "Bahnschrift";
+    -fx-font-family: "Zen Old Mincho";
     -fx-font-size: 20px;
     -fx-font-weight: bold;
-    -fx-text-fill: -fx-app-saffron;
+    -fx-text-fill: -fx-app-shu;
 }
 
 .pass-range {
-    -fx-font-family: "Bahnschrift";
+    -fx-font-family: "Zen Old Mincho";
     -fx-font-size: 20px;
     -fx-font-weight: bold;
-    -fx-text-fill: -fx-app-on-pine;
+    -fx-text-fill: -fx-app-ink;
 }
 
 .pass-hint {
-    -fx-font-size: 12px;
-    -fx-text-fill: -fx-app-on-pine-muted;
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-app-muted;
 }
 
 .pass-foot {
-    -fx-font-size: 11px;
-    -fx-text-fill: -fx-app-on-pine-muted;
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-app-muted;
 }
 
+/* Perforacion de talon: linea punteada kin-ash. */
+
 .pass-perforation {
-    -fx-border-color: rgba(244, 247, 243, 0.22);
+    -fx-border-color: -fx-app-kin-ash;
     -fx-border-width: 1 0 0 0;
     -fx-border-style: dashed;
     -fx-min-height: 1;
@@ -83,95 +88,107 @@
     -fx-font-size: 18px;
 }
 
+/* Escalera de rangos: marcas de metal, paso activo marcado en shu. */
+
 .range-step {
     -fx-background-color: transparent;
-    -fx-background-radius: 8;
+    -fx-background-radius: 2;
     -fx-padding: 6 8;
 }
 
 .range-step--active {
-    -fx-background-color: rgba(226, 167, 46, 0.16);
+    -fx-background-color: -fx-app-surface;
 }
 
 .range-bar {
     -fx-background-radius: 2;
 }
 
+.range-step--active .range-bar {
+    -fx-background-color: -fx-app-shu;
+}
+
 .range-name {
-    -fx-font-size: 13px;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
-    -fx-text-fill: -fx-app-on-pine;
+    -fx-text-fill: -fx-app-ink;
 }
 
 .range-threshold {
-    -fx-font-size: 11px;
-    -fx-text-fill: -fx-app-on-pine-muted;
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-app-muted;
 }
 
 .range-state {
-    -fx-font-size: 10px;
+    -fx-font-size: 11px;
     -fx-font-weight: bold;
-    -fx-text-fill: -fx-app-saffron;
+    -fx-text-fill: -fx-app-shu;
 }
 
 .range-pill {
     -fx-background-color: transparent;
-    -fx-background-radius: 8;
+    -fx-background-radius: 2;
     -fx-padding: 7 6 6 6;
 }
 
 .range-pill--active {
-    -fx-background-color: rgba(226, 167, 46, 0.16);
+    -fx-background-color: -fx-app-surface;
 }
 
 .range-pill-bar {
     -fx-background-radius: 2;
 }
 
+.range-pill--active .range-pill-bar {
+    -fx-background-color: -fx-app-shu;
+}
+
 .range-pill-name {
-    -fx-font-size: 11px;
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-text-fill: -fx-app-on-pine;
+    -fx-text-fill: -fx-app-ink;
 }
 
 .range-pill-limit {
-    -fx-font-size: 10px;
-    -fx-text-fill: -fx-app-on-pine-muted;
+    -fx-font-size: 11px;
+    -fx-text-fill: -fx-app-muted;
 }
+
+/* Metales por rango; el paso activo lo pinta el shu de arriba. */
 
 .range--bronce .range-bar,
 .range--bronce .range-pill-bar {
-    -fx-background-color: #B07A4A;
+    -fx-background-color: -fx-app-kin;
 }
 
 .range--plata .range-bar,
 .range--plata .range-pill-bar {
-    -fx-background-color: #9AA7A3;
+    -fx-background-color: -fx-app-kin-ash;
 }
 
 .range--oro .range-bar,
 .range--oro .range-pill-bar {
-    -fx-background-color: #D2A33C;
+    -fx-background-color: -fx-app-shu-light;
 }
 
 .range--platino .range-bar,
 .range--platino .range-pill-bar {
-    -fx-background-color: #5C8F87;
+    -fx-background-color: -fx-app-moss;
 }
 
 .range-progress {
-    -fx-accent: -fx-app-saffron;
+    -fx-accent: -fx-app-shu;
     -fx-pref-height: 6;
 }
 
 .range-progress > .track {
-    -fx-background-color: rgba(244, 247, 243, 0.22);
-    -fx-background-radius: 3;
+    -fx-background-color: rgba(181, 167, 140, 0.50);
+    -fx-background-radius: 2;
 }
 
 .range-progress > .bar {
-    -fx-background-color: -fx-app-saffron;
-    -fx-background-radius: 3;
+    -fx-background-color: -fx-app-shu;
+    -fx-background-radius: 2;
     -fx-background-insets: 0;
     -fx-padding: 3;
 }
