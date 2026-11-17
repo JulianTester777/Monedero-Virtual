@@ -1,4 +1,4 @@
-package modelo;
+package modelo.tipo;
 
 /**
  * Rango de un cliente segun sus puntos acumulados.

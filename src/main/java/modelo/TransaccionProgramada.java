@@ -1,5 +1,9 @@
 package modelo;
 
+import modelo.tipo.EstadoProgramada;
+import modelo.tipo.Recurrencia;
+import modelo.tipo.TipoTransaccion;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

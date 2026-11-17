@@ -1,5 +1,6 @@
-package interfaz;
+package interfaz.vistas;
 
+import interfaz.Ui;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -21,7 +22,7 @@ import java.math.BigDecimal;
 import java.util.Locale;
 
 /** Formulario para depositar, retirar, transferir o canjear un beneficio. */
-final class OperacionesView implements Vista {
+public final class OperacionesView implements Vista {
 
     private final Banco banco;
     private final Cliente cliente;
@@ -40,7 +41,7 @@ final class OperacionesView implements Vista {
 
     private String operacion = "depositar";
 
-    OperacionesView(Banco banco, Cliente cliente, Runnable alCambiar) {
+    public OperacionesView(Banco banco, Cliente cliente, Runnable alCambiar) {
         this.banco = banco;
         this.cliente = cliente;
         this.alCambiar = alCambiar;

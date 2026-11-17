@@ -4,6 +4,7 @@ import estructuras.ArbolAVL;
 import estructuras.ListaEnlazada;
 import estructuras.TablaHash;
 import modelo.*;
+import modelo.tipo.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 

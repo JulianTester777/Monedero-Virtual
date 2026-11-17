@@ -1,5 +1,7 @@
 package modelo;
 
+import modelo.tipo.TipoMonedero;
+
 import estructuras.ListaEnlazada;
 import estructuras.TablaHash;
 import java.math.BigDecimal;

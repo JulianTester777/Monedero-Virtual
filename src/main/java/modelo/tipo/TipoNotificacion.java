@@ -1,4 +1,4 @@
-package modelo;
+package modelo.tipo;
 
 /** Motivo de una notificacion al cliente. */
 public enum TipoNotificacion {

@@ -1,5 +1,7 @@
 package modelo;
 
+import modelo.tipo.Rango;
+
 import estructuras.ListaEnlazada;
 import java.time.LocalDateTime;
 

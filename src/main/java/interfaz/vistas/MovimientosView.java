@@ -1,4 +1,4 @@
-package interfaz;
+package interfaz.vistas;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,7 +14,7 @@ import servicio.Banco;
 import servicio.dto.MovimientoDto;
 
 /** Historial completo de movimientos, con filtro por tipo. */
-final class MovimientosView implements Vista {
+public final class MovimientosView implements Vista {
 
     private static final String TODOS = "Todos los tipos";
 
@@ -25,7 +25,7 @@ final class MovimientosView implements Vista {
     private final Label resumen = new Label();
     private final VBox raiz;
 
-    MovimientosView(Banco banco, Cliente cliente) {
+    public MovimientosView(Banco banco, Cliente cliente) {
         this.banco = banco;
         this.cliente = cliente;
         raiz = construir();

@@ -1,5 +1,7 @@
 package modelo;
 
+import modelo.tipo.TipoMonedero;
+
 import java.math.BigDecimal;
 
 /** Saldo independiente dentro de la cuenta de un cliente. */

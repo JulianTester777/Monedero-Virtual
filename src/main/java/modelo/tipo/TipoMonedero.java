@@ -1,4 +1,4 @@
-package modelo;
+package modelo.tipo;
 
 /** Tipo de monedero que puede tener un cliente. */
 public enum TipoMonedero {

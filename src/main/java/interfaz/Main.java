@@ -56,7 +56,7 @@ public final class Main extends Application {
     private void cargarEstilos() {
         for (String hoja : ESTILOS) {
             escena.getStylesheets().add(Objects.requireNonNull(
-                    Main.class.getResource("/interfaz/" + hoja),
+                    Main.class.getResource("/interfaz/estilos/" + hoja),
                     "No se encontró /interfaz/" + hoja).toExternalForm());
         }
     }

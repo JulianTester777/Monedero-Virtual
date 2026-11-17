@@ -3,7 +3,7 @@ package servicio;
 import estructuras.GrafoDirigido;
 import estructuras.ListaEnlazada;
 import estructuras.TablaHash;
-import modelo.TipoTransaccion;
+import modelo.tipo.TipoTransaccion;
 import modelo.Transaccion;
 
 /**

@@ -1,5 +1,6 @@
-package interfaz;
+package interfaz.vistas;
 
+import interfaz.Ui;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -9,7 +10,7 @@ import javafx.scene.layout.VBox;
 import servicio.dto.MovimientoDto;
 
 /** Fila compartida por el resumen, el historial y las reversiones. */
-final class MovimientoCell extends ListCell<MovimientoDto> {
+public final class MovimientoCell extends ListCell<MovimientoDto> {
 
     @Override
     protected void updateItem(MovimientoDto movimiento, boolean vacio) {

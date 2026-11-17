@@ -1,5 +1,6 @@
-package interfaz;
+package interfaz.vistas;
 
+import interfaz.Ui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -17,7 +18,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import org.kordamp.ikonli.feather.Feather;
 import modelo.Cliente;
-import modelo.Recurrencia;
+import modelo.tipo.Recurrencia;
 import servicio.Banco;
 import servicio.OperacionInvalidaException;
 import servicio.dto.ProgramadaDto;
@@ -26,7 +27,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
-final class ProgramadasView implements Vista {
+public final class ProgramadasView implements Vista {
 
     private final Banco banco;
     private final Cliente cliente;
@@ -41,7 +42,7 @@ final class ProgramadasView implements Vista {
     private final Label feedback = new Label();
     private final VBox raiz;
 
-    ProgramadasView(Banco banco, Cliente cliente, Runnable alCambiar) {
+    public ProgramadasView(Banco banco, Cliente cliente, Runnable alCambiar) {
         this.banco = banco;
         this.cliente = cliente;
         this.alCambiar = alCambiar;

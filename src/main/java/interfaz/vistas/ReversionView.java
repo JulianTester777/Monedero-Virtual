@@ -1,5 +1,6 @@
-package interfaz;
+package interfaz.vistas;
 
+import interfaz.Ui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -15,7 +16,7 @@ import servicio.Banco;
 import servicio.OperacionInvalidaException;
 import servicio.dto.MovimientoDto;
 
-final class ReversionView implements Vista {
+public final class ReversionView implements Vista {
 
     private final Banco banco;
     private final Cliente cliente;
@@ -25,7 +26,7 @@ final class ReversionView implements Vista {
     private final Label feedback = new Label();
     private final VBox raiz;
 
-    ReversionView(Banco banco, Cliente cliente, Runnable alCambiar) {
+    public ReversionView(Banco banco, Cliente cliente, Runnable alCambiar) {
         this.banco = banco;
         this.cliente = cliente;
         this.alCambiar = alCambiar;

@@ -6,7 +6,7 @@ import estructuras.TablaHash;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import modelo.Notificacion;
-import modelo.TipoNotificacion;
+import modelo.tipo.TipoNotificacion;
 
 /**
  * Notificaciones por cliente. Cada cliente tiene una lista circular para recorrer

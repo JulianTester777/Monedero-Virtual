@@ -1,5 +1,6 @@
-package interfaz;
+package interfaz.vistas;
 
+import interfaz.Ui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -16,7 +17,7 @@ import servicio.dto.FlujoDto;
 import servicio.dto.ReporteDto;
 import estructuras.ListaEnlazada;
 
-final class ReportesView implements Vista {
+public final class ReportesView implements Vista {
 
     private final Banco banco;
     private final Cliente cliente;
@@ -29,7 +30,7 @@ final class ReportesView implements Vista {
     private final Label ciclos = new Label();
     private final VBox raiz;
 
-    ReportesView(Banco banco, Cliente cliente) {
+    public ReportesView(Banco banco, Cliente cliente) {
         this.banco = banco;
         this.cliente = cliente;
         raiz = construir();

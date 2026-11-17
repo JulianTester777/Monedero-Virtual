@@ -1,5 +1,6 @@
-package interfaz;
+package interfaz.vistas;
 
+import interfaz.Ui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -15,7 +16,7 @@ import servicio.dto.MovimientoDto;
 import servicio.dto.ResumenDto;
 
 /** Vista inicial: saldo, puntos y los últimos movimientos. */
-final class ResumenView implements Vista {
+public final class ResumenView implements Vista {
 
     private static final int RECIENTES = 5;
 
@@ -29,7 +30,7 @@ final class ResumenView implements Vista {
     private final ListView<MovimientoDto> lista = new ListView<>();
     private final VBox raiz;
 
-    ResumenView(Banco banco, Cliente cliente) {
+    public ResumenView(Banco banco, Cliente cliente) {
         this.banco = banco;
         this.cliente = cliente;
         raiz = construir();

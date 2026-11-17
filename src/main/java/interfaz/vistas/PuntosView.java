@@ -1,5 +1,6 @@
-package interfaz;
+package interfaz.vistas;
 
+import interfaz.Ui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -25,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /** Detalle de puntos: progreso de rango, historial y canje de beneficios. */
-final class PuntosView implements Vista {
+public final class PuntosView implements Vista {
 
     private final Banco banco;
     private final Cliente cliente;
@@ -41,7 +42,7 @@ final class PuntosView implements Vista {
     private final Map<String, Label> estados = new HashMap<>();
     private final VBox raiz;
 
-    PuntosView(Banco banco, Cliente cliente, Runnable alCambiar) {
+    public PuntosView(Banco banco, Cliente cliente, Runnable alCambiar) {
         this.banco = banco;
         this.cliente = cliente;
         this.alCambiar = alCambiar;

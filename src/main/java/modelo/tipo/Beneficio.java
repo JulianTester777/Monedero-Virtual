@@ -1,4 +1,4 @@
-package modelo;
+package modelo.tipo;
 
 public enum Beneficio {
 

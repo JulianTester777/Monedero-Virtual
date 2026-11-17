@@ -1,5 +1,6 @@
-package interfaz;
+package interfaz.vistas;
 
+import interfaz.Ui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -16,14 +17,14 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.feather.Feather;
 import modelo.Cliente;
-import modelo.TipoMonedero;
+import modelo.tipo.TipoMonedero;
 import servicio.Banco;
 import servicio.OperacionInvalidaException;
 import servicio.dto.MonederoDto;
 
 import java.math.BigDecimal;
 
-final class MonederosView implements Vista {
+public final class MonederosView implements Vista {
 
     private final Banco banco;
     private final Cliente cliente;
@@ -39,7 +40,7 @@ final class MonederosView implements Vista {
     private final Label feedback = new Label();
     private final VBox raiz;
 
-    MonederosView(Banco banco, Cliente cliente, Runnable alCambiar) {
+    public MonederosView(Banco banco, Cliente cliente, Runnable alCambiar) {
         this.banco = banco;
         this.cliente = cliente;
         this.alCambiar = alCambiar;

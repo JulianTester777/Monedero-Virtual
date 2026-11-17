@@ -1,5 +1,6 @@
-package interfaz;
+package interfaz.vistas;
 
+import interfaz.Ui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -16,7 +17,7 @@ import servicio.Banco;
 import servicio.dto.RankingDto;
 
 /** Ranking completo de clientes por puntos acumulados. */
-final class RankingView implements Vista {
+public final class RankingView implements Vista {
 
     private final Banco banco;
     private final Cliente cliente;
@@ -24,7 +25,7 @@ final class RankingView implements Vista {
     private final ListView<RankingDto> lista = new ListView<>();
     private final VBox raiz;
 
-    RankingView(Banco banco, Cliente cliente) {
+    public RankingView(Banco banco, Cliente cliente) {
         this.banco = banco;
         this.cliente = cliente;
         raiz = construir();

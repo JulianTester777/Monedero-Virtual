@@ -7,9 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
-import modelo.Beneficio;
+import modelo.tipo.Beneficio;
 import modelo.MovimientoPuntos;
-import modelo.TipoTransaccion;
+import modelo.tipo.TipoTransaccion;
 import modelo.Transaccion;
 import org.junit.jupiter.api.Test;
 

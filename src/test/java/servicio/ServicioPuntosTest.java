@@ -10,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import estructuras.ListaEnlazada;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import modelo.Beneficio;
+import modelo.tipo.Beneficio;
 import modelo.CuentaPuntos;
 import modelo.EntradaPuntos;
 import modelo.MovimientoPuntos;
-import modelo.TipoTransaccion;
+import modelo.tipo.TipoTransaccion;
 import modelo.Transaccion;
 import org.junit.jupiter.api.Test;
 

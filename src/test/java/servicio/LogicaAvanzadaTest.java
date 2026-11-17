@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import modelo.TipoMonedero;
+import modelo.tipo.TipoMonedero;
 import modelo.Transaccion;
 import modelo.TransaccionProgramada;
 import org.junit.jupiter.api.Test;
@@ -57,7 +57,7 @@ class LogicaAvanzadaTest {
     void noRevierteSiLosPuntosYaSeGastaron() {
         Banco banco = bancoConClientes();
         banco.depositar("C1", new BigDecimal("100000"));
-        banco.canjearBeneficio("C1", modelo.Beneficio.BONO_SALDO);
+        banco.canjearBeneficio("C1", modelo.tipo.Beneficio.BONO_SALDO);
 
         assertThrows(OperacionInvalidaException.class, () -> banco.revertirUltimaTransaccion("C1"));
         assertEquals(0, banco.consultarSaldo("C1").compareTo(new BigDecimal("100050")));
@@ -76,7 +76,7 @@ class LogicaAvanzadaTest {
         banco.getReloj().avanzarDias(1);
         assertEquals(1, banco.procesarProgramadas().tamano());
         assertEquals(0, banco.consultarSaldo("C1").compareTo(new BigDecimal("700")));
-        assertEquals(modelo.EstadoProgramada.EJECUTADA, p.getEstado());
+        assertEquals(modelo.tipo.EstadoProgramada.EJECUTADA, p.getEstado());
     }
 
     @Test
@@ -88,7 +88,7 @@ class LogicaAvanzadaTest {
 
         banco.procesarProgramadas();
 
-        assertEquals(modelo.EstadoProgramada.FALLIDA, p.getEstado());
+        assertEquals(modelo.tipo.EstadoProgramada.FALLIDA, p.getEstado());
         assertTrue(banco.notificacionesNoLeidas("C1") > 0);
     }
 

@@ -8,8 +8,8 @@ import modelo.CuentaPuntos;
 import modelo.Monedero;
 import modelo.MovimientoPuntos;
 import modelo.ResultadoIntegridad;
-import modelo.TipoMovimientoPuntos;
-import modelo.TipoTransaccion;
+import modelo.tipo.TipoMovimientoPuntos;
+import modelo.tipo.TipoTransaccion;
 import modelo.Transaccion;
 
 /** Verificaciones recursivas sobre saldos, puntos y transacciones. */

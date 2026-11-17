@@ -1,5 +1,6 @@
-package interfaz;
+package interfaz.vistas;
 
+import interfaz.Ui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -13,7 +14,7 @@ import modelo.Cliente;
 import servicio.Banco;
 import servicio.dto.IntegridadDto;
 
-final class IntegridadView implements Vista {
+public final class IntegridadView implements Vista {
 
     private final Banco banco;
     private final Cliente cliente;
@@ -22,7 +23,7 @@ final class IntegridadView implements Vista {
     private final ListView<String> errores = new ListView<>();
     private final VBox raiz;
 
-    IntegridadView(Banco banco, Cliente cliente, Runnable alCambiar) {
+    public IntegridadView(Banco banco, Cliente cliente, Runnable alCambiar) {
         this.banco = banco;
         this.cliente = cliente;
         this.alCambiar = alCambiar;

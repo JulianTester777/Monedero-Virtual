@@ -7,7 +7,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import modelo.Rango;
+import modelo.tipo.Rango;
 
 import java.util.ArrayList;
 import java.util.List;

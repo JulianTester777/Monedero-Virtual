@@ -1,5 +1,7 @@
 package modelo;
 
+import modelo.tipo.TipoNotificacion;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 

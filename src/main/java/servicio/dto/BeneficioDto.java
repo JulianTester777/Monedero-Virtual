@@ -1,6 +1,6 @@
 package servicio.dto;
 
-import modelo.Beneficio;
+import modelo.tipo.Beneficio;
 
 public record BeneficioDto(
         Beneficio beneficio,
