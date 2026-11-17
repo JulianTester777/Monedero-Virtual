@@ -6,12 +6,14 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import modelo.Cliente;
-import modelo.TipoMonedero;
+import modelo.tipo.TipoMonedero;
+import persistencia.RegistroOperaciones;
 import servicio.Banco;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -39,7 +41,7 @@ public final class Main extends Application {
     @Override
     public void start(Stage stage) {
         cargarFuentes();
-        banco = crearBancoDemo();
+        banco = crearBanco();
         escena = new Scene(new StackPane(), 1120, 720);
         cargarEstilos();
 
@@ -91,11 +93,25 @@ public final class Main extends Application {
         }
     }
 
-    private Banco crearBancoDemo() {
-        Banco banco = new Banco();
-        banco.registrarCliente("ana", "Ana Torres");
-        banco.registrarCliente("bruno", "Bruno Ríos");
-        banco.registrarCliente("carla", "Carla Méndez");
+    /**
+     * Crea el banco con persistencia en monedero.log: si el registro existe de
+     * una sesion anterior, se reproduce; si no, se cargan las cuentas demo.
+     */
+    private Banco crearBanco() {
+        RegistroOperaciones registro = new RegistroOperaciones(Path.of("monedero.log"));
+        Banco banco = new Banco(registro);
+        if (registro.existe()) {
+            registro.repetir(banco);
+        } else {
+            cargarDemo(banco);
+        }
+        return banco;
+    }
+
+    private void cargarDemo(Banco banco) {
+        banco.registrarCliente("ana", "Ana Torres", "demo");
+        banco.registrarCliente("bruno", "Bruno Ríos", "demo");
+        banco.registrarCliente("carla", "Carla Méndez", "demo");
 
         banco.depositar("ana", new BigDecimal("65000"));
         banco.transferir("ana", "bruno", new BigDecimal("5000"));
@@ -105,6 +121,5 @@ public final class Main extends Application {
         banco.crearMonedero("ana", "ahorro", "Ahorro", TipoMonedero.AHORRO);
         banco.transferirEntreMonederos("ana", Cliente.MONEDERO_PRINCIPAL, "ahorro", new BigDecimal("15000"));
         banco.programarDeposito("carla", new BigDecimal("5000"), LocalDateTime.now().plusDays(7));
-        return banco;
     }
 }

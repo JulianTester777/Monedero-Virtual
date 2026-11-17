@@ -5,6 +5,7 @@ import estructuras.ListaEnlazada;
 import estructuras.Pila;
 import estructuras.TablaHash;
 import modelo.*;
+import modelo.tipo.*;
 import servicio.dto.BeneficioDto;
 import servicio.dto.FlujoDto;
 import servicio.dto.IntegridadDto;
@@ -18,6 +19,8 @@ import servicio.dto.ReporteDto;
 import servicio.dto.ResumenDto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import persistencia.Credenciales;
+import persistencia.RegistroOperaciones;
 
 /**
  * Fachada con la logica de negocio. Los clientes se guardan en una tabla hash por id,
@@ -38,6 +41,23 @@ public class Banco {
     private final ServicioNotificaciones notificaciones = new ServicioNotificaciones();
     private final ServicioReportes reportes = new ServicioReportes();
     private final ServicioIntegridad integridad = new ServicioIntegridad();
+    private final TablaHash<String, String> credenciales = new TablaHash<>();
+    private final RegistroOperaciones registro;
+
+    /** Banco sin persistencia: lo usan las pruebas. */
+    public Banco() {
+        this.registro = null;
+    }
+
+    /** Banco con persistencia: cada operacion de estado se guarda en el registro. */
+    public Banco(RegistroOperaciones registro) {
+        this.registro = registro;
+    }
+
+    /** Guarda una linea en el registro; no hace nada si el banco no tiene persistencia. */
+    private void persistir(String linea) {
+        if (registro != null) registro.registrar(linea);
+    }
 
     public Cliente registrarCliente(String id, String nombre) {
         if (id == null || id.isBlank()) throw new OperacionInvalidaException("El id es obligatorio.");
@@ -48,6 +68,34 @@ public class Banco {
         puntos.registrarCliente(id);
         reversibles.poner(id, new Pila<>());
         return c;
+    }
+
+    /** Registra un cliente con contrasena (se guarda como hash con sal, nunca en texto plano). */
+    public Cliente registrarCliente(String id, String nombre, String password) {
+        if (password == null || password.isBlank())
+            throw new OperacionInvalidaException("La contrasena es obligatoria.");
+        Cliente c = registrarCliente(id, nombre);
+        credenciales.poner(id, Credenciales.guardar(password));
+        persistir("CREAR;" + id + ";" + nombre + ";" + credenciales.obtener(id));
+        return c;
+    }
+
+    /** Verifica las credenciales de un cliente registrado con contrasena. */
+    public boolean autenticar(String id, String password) {
+        if (id == null || password == null || !clientes.contiene(id)) return false;
+        String guardado = credenciales.obtener(id);
+        return guardado != null && Credenciales.verificar(guardado, password);
+    }
+
+    /**
+     * Repone la credencial de un cliente durante la reproduccion del registro
+     * y vuelve a escribir su linea CREAR para que el archivo quede intacto.
+     */
+    public void restaurarCredencial(String id, String credencial) {
+        if (!clientes.contiene(id))
+            throw new OperacionInvalidaException("No existe el cliente " + id);
+        credenciales.poner(id, credencial);
+        persistir("CREAR;" + id + ";" + clientes.obtener(id).getNombre() + ";" + credencial);
     }
 
     public Cliente buscarCliente(String id) {
@@ -65,7 +113,9 @@ public class Banco {
     public Monedero crearMonedero(String idCliente, String idMonedero, String nombre, TipoMonedero tipo) {
         Cliente c = buscarCliente(idCliente);
         try {
-            return c.crearMonedero(idMonedero, nombre, tipo);
+            Monedero monedero = c.crearMonedero(idMonedero, nombre, tipo);
+            persistir("MONEDERO;" + idCliente + ";" + monedero.getId() + ";" + nombre + ";" + tipo.name());
+            return monedero;
         } catch (IllegalArgumentException ex) {
             throw new OperacionInvalidaException(ex.getMessage());
         }
@@ -91,12 +141,14 @@ public class Banco {
         validarMonto(monto);
         Cliente c = buscarCliente(id);
         Monedero monedero = buscarMonedero(c, idMonedero);
+        LocalDateTime ahora = reloj.ahora();
         monedero.acreditar(monto);
-        Transaccion t = new Transaccion(TipoTransaccion.DEPOSITO, monto, BigDecimal.ZERO, reloj.ahora(), id, null);
+        Transaccion t = new Transaccion(TipoTransaccion.DEPOSITO, monto, BigDecimal.ZERO, ahora, id, null);
         t.setMonederoId(monedero.getId());
         c.getHistorial().agregar(t);
         puntos.otorgar(t);
         registrar(t, true);
+        persistir("DEPOSITO;" + id + ";" + monedero.getId() + ";" + monto.toPlainString() + ";" + ahora);
         revisarSaldoBajo(id);
         return t;
     }
@@ -119,6 +171,7 @@ public class Banco {
         c.getHistorial().agregar(t);
         puntos.otorgar(t);
         registrar(t, true);
+        persistir("RETIRO;" + id + ";" + monedero.getId() + ";" + monto.toPlainString() + ";" + ahora);
         revisarSaldoBajo(id);
         return t;
     }
@@ -155,6 +208,8 @@ public class Banco {
         puntos.otorgar(enviada); // solo quien envia gana puntos
         registrar(enviada, true);
         registrar(recibida, true);
+        persistir("TRANSFERENCIA;" + idOrigen + ";" + monederoOrigen.getId() + ";" + idDestino + ";"
+                + monederoDestino.getId() + ";" + monto.toPlainString() + ";" + ahora);
         revisarSaldoBajo(idOrigen);
         revisarSaldoBajo(idDestino);
         return enviada;
@@ -170,14 +225,17 @@ public class Banco {
         Monedero origen = buscarMonedero(c, idOrigen);
         Monedero destino = buscarMonedero(c, idDestino);
         validarSaldo(origen, monto, BigDecimal.ZERO);
+        LocalDateTime ahora = reloj.ahora();
         origen.debitar(monto);
         destino.acreditar(monto);
         Transaccion t = new Transaccion(TipoTransaccion.TRANSFERENCIA_ENTRE_MONEDEROS, monto,
-                BigDecimal.ZERO, reloj.ahora(), idCliente, null);
+                BigDecimal.ZERO, ahora, idCliente, null);
         t.setMonederoId(origen.getId());
         t.setMonederoDestinoId(destino.getId());
         c.getHistorial().agregar(t);
         registrar(t, false);
+        persistir("MOVIMIENTO;" + idCliente + ";" + origen.getId() + ";" + destino.getId() + ";"
+                + monto.toPlainString() + ";" + ahora);
         reportes.registrarTransferenciaEntreMonederos(idCliente, origen.getId(), destino.getId());
         return t;
     }
@@ -195,6 +253,7 @@ public class Banco {
             registrar(t, false);
             revisarSaldoBajo(id);
         }
+        persistir("CANJE;" + id + ";" + beneficio.name() + ";" + ahora);
         return m;
     }
 
@@ -263,7 +322,51 @@ public class Banco {
         TransaccionProgramada p = programadasPorId.obtener(idProgramada);
         if (p == null || !p.esPendiente()) return false;
         p.cancelar();
+        persistir("CANCELAR_PROGRAMADA;" + idProgramada);
         return true;
+    }
+
+    /** Marca una programada como ejecutada durante la reproduccion del registro. */
+    public void marcarProgramadaEjecutada(int idProgramada) {
+        TransaccionProgramada p = buscarProgramada(idProgramada);
+        p.marcarEjecutada();
+        persistir("EJECUTADA;" + idProgramada);
+    }
+
+    /**
+     * Reproduce una programada fallida: deja el estado FALLIDA y vuelve a crear
+     * el aviso original para que los ids de notificaciones queden alineados.
+     */
+    public void restaurarFallaProgramada(int idProgramada, LocalDateTime fechaAviso, String mensaje) {
+        TransaccionProgramada p = buscarProgramada(idProgramada);
+        p.marcarFallida();
+        notificaciones.encolar(p.getClienteId(), TipoNotificacion.PROGRAMADA, mensaje, fechaAviso);
+        persistir("FALLIDA;" + idProgramada + ";" + fechaAviso + ";" + mensaje);
+    }
+
+    /**
+     * Reprograma una programada pendiente durante la reproduccion, sin volver a
+     * insertarla en la cola (ya esta desde su linea PROGRAMAR).
+     */
+    public void reprogramarProgramada(int idProgramada, LocalDateTime nuevaFecha) {
+        TransaccionProgramada p = buscarProgramada(idProgramada);
+        p.reprogramar(nuevaFecha);
+        reordenarProgramadas();
+        persistir("REPROGRAMAR;" + idProgramada + ";" + nuevaFecha);
+    }
+
+    private TransaccionProgramada buscarProgramada(int idProgramada) {
+        TransaccionProgramada p = programadasPorId.obtener(idProgramada);
+        if (p == null)
+            throw new OperacionInvalidaException("No existe la programada #" + idProgramada);
+        return p;
+    }
+
+    /** Vacia y vuelve a insertar la cola: restaura el orden del monticulo tras cambiar una fecha. */
+    private void reordenarProgramadas() {
+        ListaEnlazada<TransaccionProgramada> todas = new ListaEnlazada<>();
+        while (!programadas.estaVacia()) todas.agregar(programadas.extraerMinimo());
+        for (TransaccionProgramada p : todas) programadas.insertar(p);
     }
 
     public ListaEnlazada<Transaccion> procesarProgramadas() {
@@ -285,14 +388,17 @@ public class Banco {
                 if (p.getRecurrencia() != Recurrencia.NINGUNA) {
                     p.reprogramar(p.getRecurrencia().siguiente(p.getFecha()));
                     programadas.insertar(p);
+                    persistir("REPROGRAMAR;" + p.getId() + ";" + p.getFecha());
                 } else {
                     p.marcarEjecutada();
+                    persistir("EJECUTADA;" + p.getId());
                 }
             } catch (RuntimeException ex) {
                 p.marcarFallida();
-                notificaciones.encolar(p.getClienteId(), TipoNotificacion.PROGRAMADA,
-                        "No se pudo ejecutar la programada #" + p.getId() + ": " + ex.getMessage(),
-                        reloj.ahora());
+                String mensaje = "No se pudo ejecutar la programada #" + p.getId() + ": " + ex.getMessage();
+                LocalDateTime aviso = reloj.ahora();
+                notificaciones.encolar(p.getClienteId(), TipoNotificacion.PROGRAMADA, mensaje, aviso);
+                persistir("FALLIDA;" + p.getId() + ";" + aviso + ";" + mensaje);
             }
         }
         return ejecutadas;
@@ -309,7 +415,9 @@ public class Banco {
     }
 
     public boolean marcarNotificacionLeida(int idNotificacion) {
-        return notificaciones.marcarLeida(idNotificacion);
+        boolean leida = notificaciones.marcarLeida(idNotificacion);
+        if (leida) persistir("LEIDA;" + idNotificacion);
+        return leida;
     }
 
     public int notificacionesNoLeidas(String idCliente) {
@@ -323,6 +431,7 @@ public class Banco {
 
     public void configurarUmbralSaldoBajo(BigDecimal umbral) {
         notificaciones.configurarUmbralSaldoBajo(umbral);
+        persistir("UMBRAL;" + umbral.toPlainString());
     }
 
     public ListaEnlazada<String> generarReportePatrones(String idCliente) {
@@ -719,7 +828,7 @@ public class Banco {
     private Transaccion aplicarReversion(Transaccion t) {
         if (t.estaRevertida())
             throw new OperacionInvalidaException("La transaccion #" + t.getId() + " ya fue revertida.");
-        return switch (t.getTipo()) {
+        Transaccion reversada = switch (t.getTipo()) {
             case BONO -> throw new OperacionInvalidaException("No se puede revertir un bono de saldo.");
             case DEPOSITO -> revertirDeposito(t);
             case RETIRO -> revertirRetiro(t);
@@ -727,6 +836,8 @@ public class Banco {
             case TRANSFERENCIA_RECIBIDA -> revertirTransferenciaRecibida(t);
             case TRANSFERENCIA_ENTRE_MONEDEROS -> revertirEntreMonederos(t);
         };
+        persistir("REVERSION;" + reversada.getClienteId() + ";" + reversada.getId() + ";" + reloj.ahora());
+        return reversada;
     }
 
     private Transaccion revertirDeposito(Transaccion t) {
@@ -824,10 +935,13 @@ public class Banco {
         }
         TransaccionProgramada p = new TransaccionProgramada(idCliente, tipo, monto, destinoId,
                 fecha, recurrencia == null ? Recurrencia.NINGUNA : recurrencia);
+        LocalDateTime ahora = reloj.ahora();
         programadas.insertar(p);
         programadasPorId.poner(p.getId(), p);
         notificaciones.encolar(idCliente, TipoNotificacion.PROGRAMADA,
-                "Programada #" + p.getId() + " para " + fecha + ".", reloj.ahora());
+                "Programada #" + p.getId() + " para " + fecha + ".", ahora);
+        persistir("PROGRAMAR;" + tipo.name() + ";" + idCliente + ";" + (destinoId == null ? "" : destinoId)
+                + ";" + monto.toPlainString() + ";" + fecha + ";" + p.getRecurrencia().name() + ";" + ahora);
         return p;
     }
 

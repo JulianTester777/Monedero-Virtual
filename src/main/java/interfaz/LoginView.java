@@ -6,8 +6,11 @@ import javafx.geometry.Pos;
 import javafx.scene.AccessibleRole;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -18,14 +21,14 @@ import modelo.Cliente;
 import servicio.Banco;
 import servicio.OperacionInvalidaException;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 
 /**
- * Pantalla de acceso por ID de cliente. Todo el contenido (pase, formulario y
- * botón de tema) vive dentro de un único scroll vertical: en pantallas bajas
- * nada queda fuera de alcance.
+ * Pantalla de acceso con dos momentos: acceder con ID y contrasena, o crear
+ * una cuenta nueva. Todo el contenido (pase, formulario y boton de tema) vive
+ * dentro de un unico scroll vertical: en pantallas bajas nada queda fuera de
+ * alcance.
  */
 final class LoginView extends ScrollPane {
 
@@ -36,12 +39,22 @@ final class LoginView extends ScrollPane {
     private final Consumer<Boolean> alTema;
     private final boolean oscuro;
     private final PassCard pase = new PassCard(true);
-    private final StackPane contenedorFormulario = new StackPane();
-    private final TextField idCampo = new TextField();
+    private final StackPane contenedorFormularios = new StackPane();
+    private final TextField idAcceso = campoTexto("ID de cliente", "Ej. ana");
+    private final PasswordField claveAcceso = new PasswordField();
+    private final TextField idNuevo = campoTexto("ID de cliente", "Ej. dehib");
+    private final TextField nombreNuevo = campoTexto("Nombre completo", "Ej. Dehib Pérez");
+    private final PasswordField claveNueva = new PasswordField();
+    private final ToggleButton momentoAcceder = new ToggleButton("Acceder");
+    private final ToggleButton momentoCrear = new ToggleButton("Crear cuenta");
     private final Label error = new Label();
     private final VBox pagina = new VBox(16);
     private final HBox cuerpoAmplio = new HBox(32);
     private final HBox filaSuperior = construirFilaSuperior();
+    // Se construyen en el constructor: los chips de usuarios necesitan el banco ya asignado.
+    private final VBox formularioAcceso;
+    private final VBox formularioCreacion;
+    private final VBox formulario;
 
     private boolean compacto;
     private boolean inicializado;
@@ -51,6 +64,9 @@ final class LoginView extends ScrollPane {
         this.alEntrar = alEntrar;
         this.alTema = alTema;
         this.oscuro = oscuro;
+        this.formularioAcceso = construirFormularioAcceso();
+        this.formularioCreacion = construirFormularioCreacion();
+        this.formulario = construirFormulario();
         getStyleClass().addAll("login-view", "content-scroll");
         if (oscuro) getStyleClass().add("theme-dark");
 
@@ -59,10 +75,12 @@ final class LoginView extends ScrollPane {
         setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         setContent(pagina);
 
-        VBox formulario = construirFormulario();
-        contenedorFormulario.getChildren().add(formulario);
-        contenedorFormulario.setAlignment(Pos.CENTER_LEFT);
-        HBox.setHgrow(contenedorFormulario, Priority.ALWAYS);
+        configurarMomentos();
+
+        contenedorFormularios.getChildren().setAll(formularioAcceso, formularioCreacion);
+        mostrarMomento(true);
+        contenedorFormularios.setAlignment(Pos.TOP_LEFT);
+        HBox.setHgrow(contenedorFormularios, Priority.ALWAYS);
         HBox.setMargin(pase, new Insets(0, 48, 0, 0));
         cuerpoAmplio.setAlignment(Pos.CENTER_LEFT);
         cuerpoAmplio.setMaxWidth(Double.MAX_VALUE);
@@ -70,29 +88,131 @@ final class LoginView extends ScrollPane {
         widthProperty().addListener((obs, anterior, actual) -> adaptar(actual.doubleValue()));
         Platform.runLater(() -> {
             adaptar(getWidth());
-            idCampo.requestFocus();
+            idAcceso.requestFocus();
         });
     }
 
     private VBox construirFormulario() {
-        Label titulo = new Label("Entra a tu monedero");
+        Label titulo = new Label("Tu monedero te espera");
         titulo.getStyleClass().add("display-title");
         titulo.setWrapText(true);
 
-        Label intro = new Label("Escribe tu ID de cliente para ver tu saldo, tus puntos y tus movimientos.");
+        Label intro = new Label("Accede con tu ID y contraseña, o crea una cuenta nueva en segundos.");
         intro.getStyleClass().add("lead");
         intro.setWrapText(true);
 
-        Label demo = new Label("IDs de demostración");
-        demo.getStyleClass().add("hint");
+        Label nota = new Label("Las contraseñas se guardan como hash SHA-256 con sal; nunca en texto plano.");
+        nota.getStyleClass().add("fine-print");
+        nota.setWrapText(true);
 
         configurarError();
 
-        VBox formulario = new VBox(16, titulo, intro, construirCampoId(), demo,
-                construirChipsDemo(), construirBotonEntrar(), error, construirNota());
+        VBox formulario = new VBox(16, titulo, intro, construirMomentos(), contenedorFormularios, error, nota);
         formulario.getStyleClass().add("login-form");
         formulario.setMaxWidth(480);
         return formulario;
+    }
+
+    private HBox construirMomentos() {
+        ToggleGroup grupo = new ToggleGroup();
+        momentoAcceder.getStyleClass().add("operation-tab");
+        momentoAcceder.setGraphic(Ui.icono(Feather.LOG_IN, 14));
+        momentoAcceder.setToggleGroup(grupo);
+        momentoAcceder.setAccessibleText("Acceder con un ID y contrasena existentes");
+
+        momentoCrear.getStyleClass().add("operation-tab");
+        momentoCrear.setGraphic(Ui.icono(Feather.USER_PLUS, 14));
+        momentoCrear.setToggleGroup(grupo);
+        momentoCrear.setAccessibleText("Crear una cuenta nueva");
+
+        momentoAcceder.setOnAction(evento -> mostrarMomento(true));
+        momentoCrear.setOnAction(evento -> mostrarMomento(false));
+
+        HBox momentos = new HBox(8, momentoAcceder, momentoCrear);
+        momentos.setMaxWidth(Double.MAX_VALUE);
+        return momentos;
+    }
+
+    private void configurarMomentos() {
+        claveAcceso.getStyleClass().add("text-field");
+        claveAcceso.setPromptText("Contraseña");
+        claveAcceso.setAccessibleText("Contraseña");
+        claveAcceso.setOnAction(evento -> intentarAcceder());
+
+        claveNueva.getStyleClass().add("text-field");
+        claveNueva.setPromptText("Elige una contraseña");
+        claveNueva.setAccessibleText("Contraseña nueva");
+        claveNueva.setOnAction(evento -> intentarCrearCuenta());
+    }
+
+    private VBox construirFormularioAcceso() {
+        Button entrar = new Button("Entrar");
+        entrar.getStyleClass().add("primary-button");
+        entrar.setGraphic(Ui.icono(Feather.LOG_IN, 15));
+        entrar.setMaxWidth(Double.MAX_VALUE);
+        entrar.setDefaultButton(true);
+        entrar.setOnAction(evento -> intentarAcceder());
+
+        Label ayuda = new Label("Cuentas registradas · las de demostración usan la contraseña demo");
+        ayuda.getStyleClass().add("hint");
+        ayuda.setWrapText(true);
+
+        VBox formulario = new VBox(16, campoEtiquetado(idAcceso, "ID de cliente"),
+                campoEtiquetado(claveAcceso, "Contraseña"), construirChipsUsuarios(), ayuda, entrar);
+        return formulario;
+    }
+
+    private VBox construirFormularioCreacion() {
+        Button crear = new Button("Crear cuenta");
+        crear.getStyleClass().add("primary-button");
+        crear.setGraphic(Ui.icono(Feather.USER_PLUS, 15));
+        crear.setMaxWidth(Double.MAX_VALUE);
+        crear.setOnAction(evento -> intentarCrearCuenta());
+
+        Label notaId = new Label("El ID se escribe en minúsculas y sin espacios; será tu usuario.");
+        notaId.getStyleClass().add("hint");
+        notaId.setWrapText(true);
+
+        VBox formulario = new VBox(16, campoEtiquetado(idNuevo, "ID de cliente"),
+                campoEtiquetado(nombreNuevo, "Nombre completo"),
+                campoEtiquetado(claveNueva, "Contraseña"), notaId, crear);
+        return formulario;
+    }
+
+    private TextField campoTexto(String accesible, String ejemplo) {
+        TextField campo = new TextField();
+        campo.getStyleClass().add("text-field");
+        campo.setPromptText(ejemplo);
+        campo.setAccessibleText(accesible);
+        return campo;
+    }
+
+    private VBox campoEtiquetado(TextField campo, String etiqueta) {
+        Label titulo = new Label(etiqueta);
+        titulo.getStyleClass().add("field-label");
+        titulo.setLabelFor(campo);
+        campo.textProperty().addListener((obs, anterior, actual) -> ocultarError());
+        return new VBox(6, titulo, campo);
+    }
+
+    /** Un boton por cada cuenta registrada: los demo y las creadas desde la vista. */
+    private HBox construirChipsUsuarios() {
+        HBox chips = new HBox(8);
+        for (Cliente cliente : banco.listarClientes()) {
+            Button chip = new Button(cliente.getId());
+            chip.getStyleClass().add("chip");
+            chip.setAccessibleText("Usar la cuenta " + cliente.getId());
+            chip.setOnAction(evento -> usarCuenta(cliente.getId()));
+            chips.getChildren().add(chip);
+        }
+        return chips;
+    }
+
+    private void usarCuenta(String id) {
+        mostrarMomento(true);
+        idAcceso.setText(id);
+        claveAcceso.clear();
+        Platform.runLater(claveAcceso::requestFocus);
     }
 
     private HBox construirFilaSuperior() {
@@ -111,48 +231,6 @@ final class LoginView extends ScrollPane {
         return fila;
     }
 
-    private VBox construirCampoId() {
-        Label etiqueta = new Label("ID de cliente");
-        etiqueta.getStyleClass().add("field-label");
-        etiqueta.setLabelFor(idCampo);
-
-        idCampo.getStyleClass().add("text-field");
-        idCampo.setPromptText("Ej. ana");
-        idCampo.setAccessibleText("ID de cliente");
-        idCampo.setOnAction(evento -> intentarEntrar());
-        idCampo.textProperty().addListener((obs, anterior, actual) -> ocultarError());
-
-        return new VBox(6, etiqueta, idCampo);
-    }
-
-    private HBox construirChipsDemo() {
-        HBox chips = new HBox(8);
-        for (String id : List.of("ana", "bruno", "carla")) {
-            Button chip = new Button(id);
-            chip.getStyleClass().add("chip");
-            chip.setAccessibleText("Usar el ID de demostración " + id);
-            chip.setOnAction(evento -> usarDemo(id));
-            chips.getChildren().add(chip);
-        }
-        return chips;
-    }
-
-    private void usarDemo(String id) {
-        idCampo.setText(id);
-        idCampo.requestFocus();
-        idCampo.end();
-    }
-
-    private Button construirBotonEntrar() {
-        Button entrar = new Button("Entrar");
-        entrar.getStyleClass().add("primary-button");
-        entrar.setGraphic(Ui.icono(Feather.LOG_IN, 15));
-        entrar.setMaxWidth(Double.MAX_VALUE);
-        entrar.setDefaultButton(true);
-        entrar.setOnAction(evento -> intentarEntrar());
-        return entrar;
-    }
-
     private void configurarError() {
         error.getStyleClass().add("form-error");
         error.setWrapText(true);
@@ -161,33 +239,60 @@ final class LoginView extends ScrollPane {
         error.setAccessibleRole(AccessibleRole.TEXT);
     }
 
-    private Label construirNota() {
-        Label nota = new Label("Esta demo no pide contraseña: el ID abre la cuenta.");
-        nota.getStyleClass().add("fine-print");
-        nota.setWrapText(true);
-        return nota;
+    private void mostrarMomento(boolean acceder) {
+        momentoAcceder.setSelected(acceder);
+        momentoCrear.setSelected(!acceder);
+        formularioAcceso.setVisible(acceder);
+        formularioAcceso.setManaged(acceder);
+        formularioCreacion.setVisible(!acceder);
+        formularioCreacion.setManaged(!acceder);
+        ocultarError();
+        Platform.runLater(() -> (acceder ? idAcceso : idNuevo).requestFocus());
     }
 
-    private void intentarEntrar() {
-        String id = idCampo.getText() == null ? "" : idCampo.getText().trim().toLowerCase(Locale.ROOT);
-        if (id.isEmpty()) {
-            mostrarError("Escribe tu ID de cliente. Puedes probar con ana, bruno o carla.");
+    private void intentarAcceder() {
+        String id = normalizar(idAcceso.getText());
+        String clave = texto(claveAcceso.getText());
+        if (id.isEmpty() || clave.isEmpty()) {
+            mostrarError("Escribe tu ID y tu contraseña. Las cuentas de prueba usan la contraseña demo.");
+            return;
+        }
+        if (!banco.autenticar(id, clave)) {
+            mostrarError("ID o contraseña incorrectos.");
+            return;
+        }
+        alEntrar.accept(banco.buscarCliente(id));
+    }
+
+    private void intentarCrearCuenta() {
+        String id = normalizar(idNuevo.getText());
+        String nombre = texto(nombreNuevo.getText());
+        String clave = texto(claveNueva.getText());
+        if (id.isEmpty() || nombre.isEmpty() || clave.isEmpty()) {
+            mostrarError("Completa el ID, el nombre y la contraseña para crear tu cuenta.");
             return;
         }
         try {
-            alEntrar.accept(banco.buscarCliente(id));
+            Cliente cliente = banco.registrarCliente(id, nombre, clave);
+            alEntrar.accept(cliente);
         } catch (OperacionInvalidaException ex) {
-            mostrarError("No encontramos ese ID. Prueba con ana, bruno o carla.");
+            mostrarError(ex.getMessage());
         }
     }
 
-    private void mostrarError(String texto) {
-        error.setText(texto);
-        error.setAccessibleText(texto);
+    private String normalizar(String texto) {
+        return texto == null ? "" : texto.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String texto(String valor) {
+        return valor == null ? "" : valor.trim();
+    }
+
+    private void mostrarError(String mensaje) {
+        error.setText(mensaje);
+        error.setAccessibleText(mensaje);
         error.setVisible(true);
         error.setManaged(true);
-        idCampo.requestFocus();
-        idCampo.selectAll();
     }
 
     private void ocultarError() {
@@ -208,11 +313,11 @@ final class LoginView extends ScrollPane {
         if (compacto) {
             if (!getStyleClass().contains("login-view--compact")) getStyleClass().add("login-view--compact");
             cuerpoAmplio.getChildren().clear();
-            pagina.getChildren().setAll(filaSuperior, pase, contenedorFormulario);
+            pagina.getChildren().setAll(filaSuperior, pase, formulario);
         } else {
             getStyleClass().remove("login-view--compact");
             pagina.getChildren().setAll(filaSuperior, cuerpoAmplio);
-            cuerpoAmplio.getChildren().setAll(pase, contenedorFormulario);
+            cuerpoAmplio.getChildren().setAll(pase, formulario);
         }
     }
 }

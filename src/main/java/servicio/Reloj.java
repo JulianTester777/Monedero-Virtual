@@ -20,4 +20,9 @@ public class Reloj {
     public void avanzarHoras(long horas) { desplazamiento = desplazamiento.plusHours(horas); }
 
     public void avanzarMinutos(long minutos) { desplazamiento = desplazamiento.plusMinutes(minutos); }
+
+    /** Fija el tiempo simulado en una fecha concreta; lo usa la reproduccion del registro. */
+    public void establecer(LocalDateTime fecha) {
+        desplazamiento = Duration.between(LocalDateTime.now(), fecha);
+    }
 }

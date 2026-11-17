@@ -36,3 +36,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# Datos locales del monedero (log de operaciones: saldos, credenciales, etc.)
+monedero.log
